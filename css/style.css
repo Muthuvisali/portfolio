@@ -356,8 +356,7 @@ nav::before {
 /* Status badge */
 .hero-badge {
   display:inline-flex; align-items:center; gap:8px;
-  background:var(--glass); border:1px solid rgba(107,61,90,.2);
-  backdrop-filter:blur(12px);
+  background:#fff; border:1px solid var(--border);
   padding:7px 18px; border-radius:100px;
   font-size:.76rem; color:var(--p700);
   font-weight:600; margin-bottom:28px;
@@ -471,14 +470,13 @@ nav::before {
   display:grid; grid-template-columns:1fr 1fr; gap:14px;
 }
 .metric-card {
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,.7);
+  background:#fff;
+  border:1px solid var(--border);
   border-radius:var(--radius-md);
   padding:22px 20px;
   position:relative; overflow:hidden;
   transition:all .35s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:var(--sh-sm), 0 1px 0 rgba(255,255,255,.8) inset;
-  backdrop-filter:blur(16px);
+  box-shadow:var(--sh-sm);
   min-width:0;
 }
 .metric-card::before {
@@ -516,9 +514,9 @@ nav::before {
 
 /* Ticker */
 .ticker-wrap {
-  overflow:hidden; border:1px solid rgba(107,61,90,.15);
+  overflow:hidden; border:1px solid var(--border);
   border-radius:var(--radius-sm); padding:12px 0;
-  background:var(--glass); backdrop-filter:blur(12px);
+  background:#fff;
   box-shadow:var(--sh-sm);
 }
 .ticker { display:flex; gap:28px; white-space:nowrap; will-change:transform; }
@@ -575,7 +573,7 @@ section { padding:100px 5%; position:relative; }
    ABOUT
 ══════════════════════════════════════ */
 #about {
-  background:linear-gradient(170deg,#ffffff 0%,#FBF5F8 100%);
+  background:#fff;
 }
 
 .about-grid {
@@ -611,10 +609,10 @@ section { padding:100px 5%; position:relative; }
   box-shadow:var(--sh-sm);
 }
 
-/* PM Philosophy box — glass card */
+/* PM Philosophy box */
 .pm-box {
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,.75);
+  background:var(--bg);
+  border:1px solid var(--border);
   border-radius:var(--radius-lg); padding:32px;
   box-shadow:var(--sh-md), 0 1px 0 rgba(255,255,255,.9) inset;
   backdrop-filter:blur(20px);
@@ -674,7 +672,7 @@ section { padding:100px 5%; position:relative; }
    EXPERIENCE
 ══════════════════════════════════════ */
 #experience {
-  background:linear-gradient(170deg,var(--bg) 0%,var(--bg-deep) 100%);
+  background:var(--bg);
 }
 
 .timeline { position:relative; }
@@ -696,7 +694,7 @@ section { padding:100px 5%; position:relative; }
 }
 .exp-dot {
   width:44px; height:44px;
-  background:var(--glass); border:2px solid var(--p300);
+  background:#fff; border:2px solid var(--p300);
   border-radius:50%; display:flex;
   align-items:center; justify-content:center;
   font-size:1.1rem; flex-shrink:0; z-index:1;
@@ -705,8 +703,8 @@ section { padding:100px 5%; position:relative; }
 }
 
 .exp-card {
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,.75);
+  background:#fff;
+  border:1px solid var(--border);
   border-radius:var(--radius-md); padding:28px 32px;
   transition:all .35s cubic-bezier(.34,1.56,.64,1);
   box-shadow:var(--sh-sm), 0 1px 0 rgba(255,255,255,.9) inset;
@@ -786,15 +784,15 @@ section { padding:100px 5%; position:relative; }
    PROJECTS
 ══════════════════════════════════════ */
 #projects {
-  background:linear-gradient(170deg,#ffffff 0%,#FBF5F8 100%);
+  background:#fff;
 }
 
 .proj-grid {
   display:grid; grid-template-columns:repeat(2,1fr); gap:24px;
 }
 .proj-card {
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,.75);
+  background:var(--bg);
+  border:1px solid var(--border);
   border-radius:var(--radius-lg); padding:32px;
   transition:all .35s cubic-bezier(.34,1.56,.64,1);
   position:relative; overflow:hidden; min-width:0;
@@ -893,19 +891,18 @@ section { padding:100px 5%; position:relative; }
    SKILLS
 ══════════════════════════════════════ */
 #skills {
-  background:linear-gradient(170deg,var(--bg) 0%,var(--bg-deep) 100%);
+  background:var(--bg);
 }
 
 .skills-grid {
   display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
 }
 .sg {
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,.75);
+  background:#fff;
+  border:1px solid var(--border);
   border-radius:var(--radius-md); padding:28px;
   transition:all .3s ease;
-  box-shadow:var(--sh-sm), 0 1px 0 rgba(255,255,255,.9) inset;
-  backdrop-filter:blur(16px);
+  box-shadow:var(--sh-sm);
   overflow:hidden; min-width:0; position:relative;
 }
 .sg::before {
@@ -950,12 +947,11 @@ section { padding:100px 5%; position:relative; }
   gap:16px; margin-top:48px;
 }
 .cert {
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,.75);
+  background:#fff;
+  border:1px solid var(--border);
   border-radius:var(--radius-md); padding:24px 18px;
   text-align:center; transition:all .35s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:var(--sh-sm), 0 1px 0 rgba(255,255,255,.9) inset;
-  backdrop-filter:blur(12px); overflow:hidden; position:relative;
+  box-shadow:var(--sh-sm); overflow:hidden; position:relative;
 }
 .cert::before {
   content:''; position:absolute; inset:0;
@@ -976,18 +972,17 @@ section { padding:100px 5%; position:relative; }
    EDUCATION
 ══════════════════════════════════════ */
 #education {
-  background:linear-gradient(170deg,#ffffff 0%,#FBF5F8 100%);
+  background:#fff;
 }
 
 .edu-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 .edu-card {
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,.75);
+  background:var(--bg);
+  border:1px solid var(--border);
   border-radius:var(--radius-lg); padding:32px;
   position:relative; overflow:hidden;
   transition:all .35s cubic-bezier(.34,1.56,.64,1);
-  box-shadow:var(--sh-sm), 0 1px 0 rgba(255,255,255,.9) inset;
-  backdrop-filter:blur(16px); min-width:0;
+  box-shadow:var(--sh-sm); min-width:0;
 }
 .edu-card::before {
   content:''; position:absolute;
