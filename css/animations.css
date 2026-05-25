@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════
+   ANIMATIONS — MUTHUVISALI RAVICHANDRA BOSE
+   All keyframes & animation utilities
+   ═══════════════════════════════════════════ */
+
+/* ── FLOATING ORBS ── */
+@keyframes floatOrb {
+  0%,100% { transform:translateY(0)   scale(1);    }
+  33%     { transform:translateY(-30px) scale(1.05); }
+  66%     { transform:translateY(-14px) scale(.97); }
+}
+
+/* ── GEOMETRIC SHAPES ── */
+@keyframes geoFloat {
+  0%,100% { transform:translateY(0)    rotate(0deg);   }
+  25%     { transform:translateY(-18px) rotate(8deg);   }
+  50%     { transform:translateY(-8px)  rotate(-5deg);  }
+  75%     { transform:translateY(-22px) rotate(12deg);  }
+}
+
+/* ── STATUS DOT PULSE ── */
+@keyframes pulseDot {
+  0%,100% { opacity:1;  box-shadow:0 0 0 3px rgba(34,197,94,.2),  0 0 0 6px rgba(34,197,94,.05); }
+  50%     { opacity:.7; box-shadow:0 0 0 6px rgba(34,197,94,.12), 0 0 0 12px rgba(34,197,94,.03); }
+}
+.badge-dot        { animation:pulseDot 2.2s ease-in-out infinite; }
+.m-status-dot     { animation:pulseDot 2.2s ease-in-out infinite; }
+.proj-lbl.on .lbl-dot { animation:pulseDot 2.2s ease-in-out infinite; }
+
+/* ── CURSOR BLINK (typewriter) ── */
+@keyframes cursorBlink {
+  0%,100% { opacity:1; }
+  50%     { opacity:0; }
+}
+
+/* ── WAVING HAND ── */
+@keyframes wave {
+  0%,100% { transform:rotate(0deg);   }
+  15%     { transform:rotate(-14deg); }
+  35%     { transform:rotate(14deg);  }
+  55%     { transform:rotate(-8deg);  }
+  75%     { transform:rotate(8deg);   }
+}
+
+/* ── GRADIENT SHIFT ── */
+@keyframes gradientShift {
+  0%,100% { background-position:0% 50%; }
+  50%     { background-position:100% 50%; }
+}
+
+/* ── TICKER SCROLL ── */
+@keyframes scrollTicker {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+.ticker { animation:scrollTicker 22s linear infinite; }
+.ticker:hover { animation-play-state:paused; }
+
+/* ── SHIMMER ── */
+@keyframes shimmer {
+  0%   { background-position:-200% center; }
+  100% { background-position:200% center; }
+}
+.shimmer-text {
+  background:linear-gradient(90deg,var(--p700) 0%,var(--p400) 40%,var(--p700) 80%);
+  background-size:200% auto;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:shimmer 3.5s linear infinite;
+}
+
+/* ── GLOW PULSE ── */
+@keyframes glowPulse {
+  0%,100% { box-shadow:0 0 16px rgba(196,149,106,.2); }
+  50%     { box-shadow:0 0 36px rgba(196,149,106,.42), 0 0 60px rgba(196,149,106,.14); }
+}
+
+/* ── BORDER SPIN (decorative) ── */
+@keyframes borderSpin {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+
+/* ── SPIN-IN (used in counter) ── */
+@keyframes spinIn {
+  from { transform:rotateY(90deg); opacity:0; }
+  to   { transform:rotateY(0deg);  opacity:1; }
+}
+
+/* ── STAGGER UTILITY CLASSES ── */
+.delay-1  { transition-delay:.08s !important; }
+.delay-2  { transition-delay:.16s !important; }
+.delay-3  { transition-delay:.24s !important; }
+.delay-4  { transition-delay:.32s !important; }
+.delay-5  { transition-delay:.40s !important; }
+.delay-6  { transition-delay:.52s !important; }
+
+/* ── SCROLL-IN: section title letters ── */
+.char-wrap  { overflow:hidden; display:inline-block; }
+.char {
+  display:inline-block;
+  transform:translateY(110%);
+  transition:transform .6s cubic-bezier(.34,1.56,.64,1);
+}
+.char.vis { transform:translateY(0); }
+
+/* ── NEON GLOW BUTTON (contact section) ── */
+.btn-neon {
+  position:relative;
+  animation:glowPulse 3s ease-in-out infinite;
+}
+
+/* ── TILT CARD (applied via JS) ── */
+.tilt-card {
+  transform-style:preserve-3d;
+  transition:transform .2s ease;
+}
+.tilt-card .tilt-inner {
+  transform:translateZ(20px);
+  transition:transform .2s ease;
+}
+
+/* ── MAGNETIC BUTTON STATE ── */
+.btn-magnetic {
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── PROGRESS RING (SVG-based for certs) ── */
+@keyframes ringFill {
+  from { stroke-dashoffset:220; }
+  to   { stroke-dashoffset:var(--dash-offset); }
+}
+.ring-progress {
+  animation:ringFill 1.4s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+/* ── FLOATING PARTICLES ── */
+@keyframes particleDrift {
+  0%,100% { transform:translateY(0)    translateX(0);   opacity:.7; }
+  33%     { transform:translateY(-30px) translateX(15px); opacity:1;  }
+  66%     { transform:translateY(10px)  translateX(-10px); opacity:.5; }
+}
+
+/* ── HERO SUBTITLE ENTRANCE ── */
+@keyframes fadeSlideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.hero-badge    { animation:fadeSlideUp .6s ease .1s both; }
+.hero-name     { animation:fadeSlideUp .7s ease .2s both; }
+.typewriter-wrap { animation:fadeSlideUp .6s ease .35s both; }
+.hero-desc     { animation:fadeSlideUp .6s ease .45s both; }
+.hero-ctas     { animation:fadeSlideUp .6s ease .55s both; }
+
+/* ── METRIC CARDS ENTRANCE ── */
+.metrics-lbl   { animation:fadeSlideUp .5s ease .3s both; }
+.metrics-grid  { animation:fadeSlideUp .5s ease .4s both; }
+.ticker-wrap   { animation:fadeSlideUp .5s ease .55s both; }
+
+/* ── SECTION DIVIDERS ── */
+.sec-divider {
+  width:100%; height:80px; overflow:hidden;
+  position:relative; pointer-events:none;
+}
+.sec-divider svg { position:absolute; bottom:0; width:100%; }
+
+/* ── SKILL PILL STAGGER (applied via JS adding .stagger-pills) ── */
+.stagger-pills .pill {
+  opacity:0; transform:translateY(8px) scale(.94);
+  transition:opacity .4s ease, transform .4s ease;
+}
+.stagger-pills.vis .pill { opacity:1; transform:translateY(0) scale(1); }
+.stagger-pills.vis .pill:nth-child(1)  { transition-delay:.02s; }
+.stagger-pills.vis .pill:nth-child(2)  { transition-delay:.05s; }
+.stagger-pills.vis .pill:nth-child(3)  { transition-delay:.08s; }
+.stagger-pills.vis .pill:nth-child(4)  { transition-delay:.11s; }
+.stagger-pills.vis .pill:nth-child(5)  { transition-delay:.14s; }
+.stagger-pills.vis .pill:nth-child(6)  { transition-delay:.17s; }
+.stagger-pills.vis .pill:nth-child(7)  { transition-delay:.20s; }
+.stagger-pills.vis .pill:nth-child(8)  { transition-delay:.23s; }
+.stagger-pills.vis .pill:nth-child(9)  { transition-delay:.26s; }
+.stagger-pills.vis .pill:nth-child(10) { transition-delay:.29s; }
+.stagger-pills.vis .pill:nth-child(11) { transition-delay:.32s; }
+.stagger-pills.vis .pill:nth-child(12) { transition-delay:.35s; }

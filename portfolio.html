@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Muthuvisali Ravichandra Bose — Product × AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:          #F5EDE8;
+      --bg-alt:      #EDD9CF;
+      --bg-card:     #ffffff;
+      --text:        #2D1B35;
+      --text-2:      #3D2645;
+      --text-3:      #6B3D5A;
+      --muted:       #C4A8B8;
+      --p50:  #FBF5F8;
+      --p100: #F5E8EF;
+      --p200: #E8C4D4;
+      --p300: #D4A0BE;
+      --p400: #A87898;
+      --p500: #8B4F7A;
+      --p600: #6B3D5A;
+      --p700: #3D2645;
+      --p800: #2D1B35;
+      --p900: #1A0F20;
+      --gold:  #C4956A;
+      --gold-h:#A87858;
+      --border:       rgba(232,196,212,0.45);
+      --border-h:     rgba(107,61,90,0.5);
+      --sh-sm:  0 2px 8px rgba(45,27,53,0.07);
+      --sh-md:  0 8px 30px rgba(45,27,53,0.11);
+      --sh-lg:  0 20px 60px rgba(45,27,53,0.14);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      width:10px; height:10px;
+      background: var(--p700); border-radius:50%;
+      position:fixed; top:0; left:0;
+      pointer-events:none; z-index:9999;
+    }
+    .cursor-ring {
+      width:36px; height:36px;
+      border:2px solid rgba(61,38,69,0.35);
+      border-radius:50%;
+      position:fixed; top:0; left:0;
+      pointer-events:none; z-index:9998;
+      transition: width .15s ease, height .15s ease, border-color .15s ease;
+    }
+
+    /* ── SCROLL BAR ── */
+    .scroll-bar {
+      position:fixed; top:0; left:0; height:3px; width:0;
+      background:linear-gradient(90deg, var(--p700), var(--p400));
+      z-index:10000; transition: width .1s linear;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:1000;
+      padding:0 5%;
+      background:rgba(26,15,32,0.94);
+      backdrop-filter:blur(24px) saturate(160%);
+      border-bottom:1px solid rgba(232,196,212,.1);
+    }
+    .nav-inner {
+      max-width:1200px; margin:0 auto;
+      display:flex; align-items:center;
+      justify-content:space-between; height:66px;
+      gap:16px;
+    }
+    .nav-logo {
+      font-family:'Space Grotesk',sans-serif;
+      font-weight:800; font-size:1.1rem;
+      color:#fff; text-decoration:none;
+      letter-spacing:-.02em; flex-shrink:0;
+    }
+    .nav-logo span {
+      background:linear-gradient(135deg,var(--gold),#E8C4D4);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .nav-links {
+      display:flex; align-items:center; gap:2px;
+      list-style:none; height:66px;
+    }
+    .nav-links li { display:flex; align-items:center; }
+    .nav-links a {
+      display:flex; align-items:center; gap:5px;
+      padding:6px 12px; color:rgba(255,255,255,.55);
+      text-decoration:none; font-size:.7rem;
+      font-weight:600; letter-spacing:.05em;
+      text-transform:uppercase; border-radius:100px;
+      transition:all .25s ease; white-space:nowrap;
+    }
+    .nav-links a .tag {
+      font-size:.56rem;
+      background:rgba(255,255,255,.1); color:rgba(255,255,255,.7);
+      padding:2px 6px; border-radius:10px;
+      font-weight:700; line-height:1; border:1px solid rgba(255,255,255,.12);
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color:#fff; background:rgba(255,255,255,.1);
+      box-shadow:0 0 0 1px rgba(255,255,255,.08);
+    }
+    .nav-links a:hover .tag, .nav-links a.active .tag {
+      background:rgba(196,149,106,.25); color:var(--gold);
+      border-color:rgba(196,149,106,.3);
+    }
+    .btn-resume {
+      flex-shrink:0;
+      font-size:.78rem; padding:8px 18px;
+      background:transparent; color:rgba(255,255,255,.75);
+      border:1.5px solid rgba(255,255,255,.25); border-radius:100px;
+      font-weight:700; text-decoration:none; cursor:pointer;
+      transition:all .3s ease; white-space:nowrap;
+      display:inline-flex; align-items:center; gap:5px;
+    }
+    .btn-resume:hover {
+      background:rgba(255,255,255,.1); color:#fff;
+      border-color:rgba(255,255,255,.5);
+      transform:translateY(-2px);
+      box-shadow:0 6px 24px rgba(0,0,0,.3);
+    }
+    .btn-hire {
+      flex-shrink:0;
+      font-size:.8rem; padding:10px 22px;
+      background:linear-gradient(135deg,var(--gold),var(--gold-h));
+      color:#fff; border:none; border-radius:100px;
+      font-weight:700; text-decoration:none; cursor:pointer;
+      transition:all .3s ease;
+      box-shadow:0 4px 20px rgba(196,149,106,.4);
+    }
+    .btn-hire:hover {
+      transform:translateY(-2px) scale(1.03);
+      box-shadow:0 8px 32px rgba(196,149,106,.55);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height:100vh;
+      display:flex; align-items:center;
+      position:relative; overflow:hidden;
+      padding:0 5%;
+      background:linear-gradient(155deg,#F5EDE8 0%,#EDD9CF 55%,#FBF5F8 100%);
+    }
+    .orb {
+      position:absolute; border-radius:50%;
+      filter:blur(72px); pointer-events:none;
+      animation:floatOrb 7s ease-in-out infinite;
+    }
+    .orb-1 {
+      width:500px; height:500px;
+      background:radial-gradient(circle,rgba(196,149,106,.22),transparent 70%);
+      top:-120px; right:-80px;
+    }
+    .orb-2 {
+      width:380px; height:380px;
+      background:radial-gradient(circle,rgba(61,38,69,.18),transparent 70%);
+      bottom:-80px; left:8%; animation-delay:-3.5s;
+    }
+    .orb-3 {
+      width:280px; height:280px;
+      background:radial-gradient(circle,rgba(232,196,212,.22),transparent 70%);
+      top:42%; left:36%; animation-delay:-1.8s;
+    }
+    @keyframes floatOrb {
+      0%,100% { transform:translateY(0) scale(1); }
+      50%      { transform:translateY(-28px) scale(1.06); }
+    }
+    .hero-grid {
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(61,38,69,.045) 1px, transparent 1px),
+        linear-gradient(90deg,rgba(61,38,69,.045) 1px, transparent 1px);
+      background-size:60px 60px;
+      pointer-events:none;
+    }
+    .hero-content {
+      max-width:1200px; margin:0 auto;
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:80px; align-items:center;
+      position:relative; z-index:2; width:100%;
+      padding-top:66px;
+    }
+
+    /* hero left */
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background:#fff; border:1px solid var(--border);
+      padding:6px 16px; border-radius:100px;
+      font-size:.76rem; color:var(--p800);
+      font-weight:600; margin-bottom:26px;
+      box-shadow:var(--sh-sm);
+    }
+    .badge-dot {
+      width:7px; height:7px;
+      background:#22c55e; border-radius:50%;
+      animation:blink 2s infinite;
+    }
+    @keyframes blink {
+      0%,100%{ opacity:1; box-shadow:0 0 0 3px rgba(34,197,94,.2); }
+      50%    { opacity:.6; box-shadow:0 0 0 6px rgba(34,197,94,.08); }
+    }
+    .hero-name {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(2.8rem,5vw,4.5rem);
+      font-weight:800; line-height:1.05;
+      letter-spacing:-.03em; margin-bottom:10px;
+      color:var(--text);
+    }
+    .hero-name .hl {
+      background:linear-gradient(135deg,var(--p700),var(--p500));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .hero-sub {
+      font-size:1rem; color:var(--text-2);
+      margin-bottom:18px; font-weight:500;
+    }
+    .hero-desc {
+      font-size:.97rem; color:var(--text-3);
+      line-height:1.78; max-width:480px; margin-bottom:38px;
+    }
+    .hero-ctas { display:flex; gap:14px; flex-wrap:wrap; }
+    .btn-primary {
+      display:inline-flex; align-items:center; gap:8px;
+      background:linear-gradient(135deg,var(--p700),var(--p500));
+      color:#fff; padding:13px 28px; border-radius:100px;
+      font-weight:700; font-size:.9rem; text-decoration:none;
+      transition:all .3s ease;
+      box-shadow:0 8px 28px rgba(61,38,69,.32);
+    }
+    .btn-primary:hover {
+      transform:translateY(-2px);
+      box-shadow:0 12px 40px rgba(61,38,69,.48);
+    }
+    .btn-outline {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--gold); color:#fff;
+      padding:13px 28px; border-radius:100px;
+      font-weight:700; font-size:.9rem; text-decoration:none;
+      border:none; transition:all .35s cubic-bezier(.34,1.56,.64,1);
+      box-shadow:0 4px 20px rgba(196,149,106,.38);
+      position:relative; overflow:hidden; cursor:pointer;
+    }
+    .btn-outline:hover {
+      background:var(--gold-h);
+      transform:translateY(-2px) scale(1.03);
+      box-shadow:0 10px 36px rgba(196,149,106,.52);
+    }
+
+    /* hero right */
+    .hero-right { display:flex; flex-direction:column; gap:16px; }
+    .metrics-lbl {
+      font-size:.68rem; font-weight:700;
+      letter-spacing:.12em; text-transform:uppercase;
+      color:var(--p700);
+      display:flex; align-items:center; gap:8px;
+    }
+    .metrics-lbl::after {
+      content:''; flex:1; height:1px; background:var(--p200);
+    }
+    .metrics-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    }
+    .metric-card {
+      background:#fff; border:1px solid var(--border);
+      border-radius:16px; padding:20px;
+      position:relative; overflow:hidden;
+      transition:all .3s ease; box-shadow:var(--sh-sm);
+    }
+    .metric-card::before {
+      content:''; position:absolute;
+      top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,var(--p700),var(--p400));
+    }
+    .metric-card:hover {
+      border-color:var(--border-h);
+      box-shadow:var(--sh-md); transform:translateY(-3px);
+    }
+    .metric-val {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:2rem; font-weight:800;
+      color:var(--text); line-height:1;
+    }
+    .metric-val span { color:var(--p600); }
+    .metric-lbl {
+      font-size:.72rem; color:var(--text-3);
+      margin-top:6px; line-height:1.45;
+    }
+    .metric-ico {
+      position:absolute; top:14px; right:14px;
+      font-size:1.2rem; opacity:.45;
+    }
+
+    /* ticker */
+    .ticker-wrap {
+      overflow:hidden; border:1px solid var(--border);
+      border-radius:12px; padding:12px 0;
+      background:#fff; box-shadow:var(--sh-sm);
+    }
+    .ticker {
+      display:flex; gap:32px;
+      animation:scrollTicker 22s linear infinite;
+      white-space:nowrap;
+    }
+    @keyframes scrollTicker {
+      0%   { transform:translateX(0); }
+      100% { transform:translateX(-50%); }
+    }
+    .t-item {
+      display:flex; align-items:center; gap:8px;
+      font-size:.76rem; color:var(--text-2); font-weight:600;
+    }
+    .t-dot {
+      width:4px; height:4px;
+      background:var(--p500); border-radius:50%;
+      flex-shrink:0;
+    }
+
+    /* ── SECTIONS ── */
+    section { padding:96px 5%; }
+    .sec-inner { max-width:1200px; margin:0 auto; }
+    .sec-tag {
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:.7rem; font-weight:700;
+      letter-spacing:.12em; text-transform:uppercase;
+      color:var(--p700); margin-bottom:14px;
+    }
+    .sec-tag::before {
+      content:''; width:22px; height:2px;
+      background:var(--p500); border-radius:2px;
+    }
+    .sec-title {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(2rem,3.5vw,2.9rem);
+      font-weight:800; letter-spacing:-.03em;
+      line-height:1.1; margin-bottom:56px;
+      color:var(--text);
+    }
+    .sec-title .ac { color:var(--p700); }
+
+    /* ── ABOUT ── */
+    #about { background:#fff; }
+    .about-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:72px; align-items:start;
+    }
+    .about-text p {
+      color:var(--text-3); line-height:1.82;
+      margin-bottom:18px; font-size:.96rem;
+    }
+    .about-text p strong { color:var(--text); font-weight:600; }
+    .contact-list {
+      list-style:none; margin-top:28px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .contact-list li {
+      display:flex; align-items:center; gap:12px;
+      font-size:.87rem; color:var(--text-3);
+      min-width:0;
+    }
+    .contact-list li a {
+      color:var(--p700); text-decoration:none;
+      transition:color .2s; font-weight:500;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .contact-list li a:hover { color:var(--p500); }
+    .ci {
+      width:34px; height:34px; flex-shrink:0;
+      background:var(--p100); border:1px solid var(--p200);
+      border-radius:9px; display:flex;
+      align-items:center; justify-content:center; font-size:.85rem;
+    }
+
+    .pm-box {
+      background:var(--bg); border:1px solid var(--border);
+      border-radius:22px; padding:30px; box-shadow:var(--sh-sm);
+    }
+    .pm-box h3 {
+      font-size:.74rem; font-weight:700; color:var(--p700);
+      letter-spacing:.1em; text-transform:uppercase; margin-bottom:22px;
+    }
+    .fw-item {
+      display:flex; gap:14px; align-items:flex-start;
+      margin-bottom:18px; padding-bottom:18px;
+      border-bottom:1px solid var(--border);
+    }
+    .fw-item:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+    .fw-num {
+      width:32px; height:32px; flex-shrink:0;
+      background:linear-gradient(135deg,var(--p700),var(--p500));
+      border-radius:8px; display:flex; align-items:center;
+      justify-content:center; font-size:.74rem;
+      font-weight:700; color:#fff;
+    }
+    .fw-item h4 { font-size:.88rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .fw-item p  { font-size:.79rem; color:var(--text-3); line-height:1.55; }
+
+    .award {
+      background:linear-gradient(135deg,var(--p100),var(--p50));
+      border:1px solid var(--p200); border-radius:14px;
+      padding:18px 22px; display:flex; align-items:center;
+      gap:14px; margin-top:20px;
+    }
+    .award-ico { font-size:1.9rem; flex-shrink:0; }
+    .award-ttl {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:.93rem; font-weight:700;
+      color:var(--p900); margin-bottom:4px;
+    }
+    .award-dsc { font-size:.78rem; color:var(--text-3); line-height:1.5; }
+
+    /* ── EXPERIENCE ── */
+    #experience { background:var(--bg); }
+    .timeline { position:relative; }
+    .timeline::before {
+      content:''; position:absolute;
+      left:20px; top:0; bottom:0; width:2px;
+      background:linear-gradient(to bottom,var(--p400),var(--p200),transparent);
+    }
+    .exp-item {
+      display:grid; grid-template-columns:auto 1fr;
+      gap:26px; margin-bottom:36px; position:relative;
+    }
+    .exp-dot-col {
+      display:flex; flex-direction:column;
+      align-items:center; padding-top:4px;
+    }
+    .exp-dot {
+      width:42px; height:42px;
+      background:#fff; border:2px solid var(--p300);
+      border-radius:50%; display:flex;
+      align-items:center; justify-content:center;
+      font-size:1.1rem; flex-shrink:0; z-index:1;
+      box-shadow:0 0 0 5px var(--bg);
+    }
+    .exp-card {
+      background:#fff; border:1px solid var(--border);
+      border-radius:20px; padding:26px 30px;
+      transition:all .3s ease; box-shadow:var(--sh-sm);
+      min-width:0;
+    }
+    .exp-card:hover {
+      border-color:var(--border-h);
+      box-shadow:var(--sh-md); transform:translateY(-2px);
+    }
+    .exp-hd {
+      display:flex; justify-content:space-between;
+      align-items:flex-start; flex-wrap:wrap;
+      gap:12px; margin-bottom:16px;
+    }
+    .exp-tg { min-width:0; }
+    .exp-tg h3 {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.12rem; font-weight:700;
+      color:var(--text); margin-bottom:4px;
+    }
+    .exp-co { font-size:.84rem; color:var(--p700); font-weight:600; }
+    .exp-bg { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+    .exp-date {
+      font-size:.73rem; color:var(--text-3);
+      background:var(--bg); padding:4px 12px;
+      border-radius:100px; font-weight:500;
+      border:1px solid var(--border); white-space:nowrap;
+    }
+    .exp-type {
+      font-size:.66rem; font-weight:700;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--p600);
+    }
+    .exp-list {
+      list-style:none; display:flex;
+      flex-direction:column; gap:9px; padding-left:13px;
+    }
+    .exp-list li {
+      position:relative; font-size:.87rem;
+      color:var(--text-3); line-height:1.62;
+    }
+    .exp-list li::before {
+      content:''; position:absolute;
+      left:-12px; top:9px;
+      width:5px; height:5px;
+      background:var(--p400); border-radius:50%;
+    }
+    .exp-list li strong { color:var(--text); font-weight:600; }
+    .chips { display:flex; flex-wrap:wrap; gap:7px; margin-top:16px; }
+    .chip {
+      font-size:.7rem; font-weight:600;
+      color:var(--p700); background:var(--p100);
+      border:1px solid var(--p200);
+      padding:4px 11px; border-radius:100px;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { background:#fff; }
+    .proj-grid {
+      display:grid; grid-template-columns:repeat(2,1fr); gap:22px;
+    }
+    .proj-card {
+      background:var(--bg); border:1px solid var(--border);
+      border-radius:22px; padding:30px;
+      transition:all .3s ease; position:relative;
+      overflow:hidden; min-width:0;
+    }
+    .proj-card::after {
+      content:''; position:absolute;
+      bottom:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,var(--p700),var(--p400));
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .4s ease;
+    }
+    .proj-card:hover {
+      border-color:var(--border-h);
+      box-shadow:var(--sh-lg); transform:translateY(-5px);
+    }
+    .proj-card:hover::after { transform:scaleX(1); }
+    .proj-card.feat {
+      grid-column:span 2;
+      display:grid; grid-template-columns:1fr 1fr; gap:30px;
+    }
+    .proj-lbl {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.7rem; font-weight:700;
+      letter-spacing:.08em; text-transform:uppercase; margin-bottom:12px;
+    }
+    .proj-lbl.on  { color:#16a34a; }
+    .proj-lbl.done{ color:var(--p700); }
+    .lbl-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .proj-lbl.on   .lbl-dot { background:#22c55e; animation:blink 2s infinite; }
+    .proj-lbl.done .lbl-dot { background:var(--p500); }
+    .proj-card h3 {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.2rem; font-weight:700;
+      color:var(--text); margin-bottom:7px; line-height:1.3;
+    }
+    .proj-role { font-size:.76rem; color:var(--p700); font-weight:600; margin-bottom:13px; }
+    .proj-card p {
+      font-size:.87rem; color:var(--text-3);
+      line-height:1.78; margin-bottom:18px;
+    }
+    .ptags { display:flex; flex-wrap:wrap; gap:7px; }
+    .ptag {
+      font-size:.7rem; font-weight:600; color:var(--text-2);
+      background:#fff; border:1px solid var(--border);
+      padding:4px 10px; border-radius:6px;
+    }
+    .proj-vis { display:flex; flex-direction:column; gap:11px; justify-content:center; }
+    .krow {
+      background:#fff; border:1px solid var(--border);
+      border-radius:11px; padding:13px 15px;
+    }
+    .krow-lbl {
+      font-size:.68rem; text-transform:uppercase;
+      letter-spacing:.08em; color:var(--text-3);
+      margin-bottom:7px; font-weight:600;
+    }
+    .kbar-bg {
+      background:var(--p100); border-radius:4px;
+      height:6px; overflow:hidden;
+    }
+    .kbar {
+      height:100%; border-radius:4px; width:0;
+      background:linear-gradient(90deg,var(--p700),var(--p400));
+      transition:width 1.4s cubic-bezier(.4,0,.2,1);
+    }
+    .kval { font-size:.73rem; font-weight:600; color:var(--p700); margin-top:5px; }
+
+    /* ── SKILLS ── */
+    #skills { background:var(--bg); }
+    .skills-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:22px;
+    }
+    .sg {
+      background:#fff; border:1px solid var(--border);
+      border-radius:20px; padding:26px;
+      transition:all .3s ease; box-shadow:var(--sh-sm);
+    }
+    .sg:hover { border-color:var(--border-h); box-shadow:var(--sh-md); }
+    .sg-hd { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+    .sg-ico {
+      width:38px; height:38px; flex-shrink:0;
+      background:linear-gradient(135deg,var(--p700),var(--p500));
+      border-radius:10px; display:flex;
+      align-items:center; justify-content:center; font-size:1.1rem;
+    }
+    .sg-ttl { font-size:.88rem; font-weight:700; color:var(--text); }
+    .pills { display:flex; flex-wrap:wrap; gap:7px; }
+    .pill {
+      font-size:.76rem; font-weight:500;
+      padding:6px 12px; border-radius:100px;
+      background:var(--p50); border:1px solid var(--p200);
+      color:var(--p800); transition:all .2s ease; cursor:default;
+    }
+    .pill:hover {
+      background:var(--p700); border-color:var(--p700); color:#fff;
+    }
+
+    /* certs */
+    .certs-grid {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:15px; margin-top:44px;
+    }
+    .cert {
+      background:#fff; border:1px solid var(--border);
+      border-radius:15px; padding:22px 18px;
+      text-align:center; transition:all .3s ease;
+      box-shadow:var(--sh-sm);
+    }
+    .cert:hover {
+      border-color:var(--border-h);
+      box-shadow:var(--sh-md); transform:translateY(-4px);
+    }
+    .cert-ico { font-size:1.9rem; margin-bottom:10px; }
+    .cert-nm { font-size:.8rem; font-weight:700; color:var(--text); margin-bottom:4px; line-height:1.3; }
+    .cert-og { font-size:.7rem; color:var(--p700); font-weight:500; }
+
+    /* ── EDUCATION ── */
+    #education { background:#fff; }
+    .edu-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+    .edu-card {
+      background:var(--bg); border:1px solid var(--border);
+      border-radius:20px; padding:30px;
+      position:relative; overflow:hidden;
+      transition:all .3s ease; box-shadow:var(--sh-sm);
+    }
+    .edu-card:hover {
+      border-color:var(--border-h);
+      box-shadow:var(--sh-md); transform:translateY(-3px);
+    }
+    .edu-card::before {
+      content:''; position:absolute;
+      top:-50px; right:-50px;
+      width:150px; height:150px;
+      background:radial-gradient(circle,var(--p200),transparent 70%);
+      pointer-events:none;
+    }
+    .edu-logo { font-size:2.1rem; margin-bottom:14px; }
+    .edu-card h3 {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.02rem; font-weight:700;
+      color:var(--text); margin-bottom:6px; line-height:1.35;
+    }
+    .edu-deg { font-size:.86rem; color:var(--p700); font-weight:600; margin-bottom:7px; line-height:1.4; }
+    .edu-per { font-size:.76rem; color:var(--text-3); margin-bottom:18px; }
+    .edu-tags { display:flex; flex-wrap:wrap; gap:7px; }
+    .edu-tag {
+      font-size:.7rem; font-weight:500; color:var(--text-2);
+      background:#fff; border:1px solid var(--border);
+      padding:4px 9px; border-radius:6px;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      background:linear-gradient(155deg,var(--p900) 0%,var(--p700) 100%);
+      text-align:center;
+    }
+    #contact .sec-tag { justify-content:center; color:var(--p200); }
+    #contact .sec-tag::before { background:var(--p300); }
+    .contact-cta { max-width:700px; margin:0 auto; }
+    .contact-cta h2 {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(2.4rem,5vw,3.8rem);
+      font-weight:800; letter-spacing:-.03em;
+      line-height:1.1; margin-bottom:22px; color:#fff;
+    }
+    .contact-cta h2 span {
+      background:linear-gradient(135deg,#E8C4D4,#C4956A);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .contact-cta p {
+      font-size:.97rem; color:rgba(255,255,255,.68);
+      line-height:1.78; margin-bottom:38px;
+    }
+    .clinks { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+    .clink {
+      display:flex; align-items:center; gap:8px;
+      padding:13px 26px; border-radius:100px;
+      font-size:.87rem; font-weight:700;
+      text-decoration:none; transition:all .3s ease; white-space:nowrap;
+    }
+    .clink.em {
+      background:#fff; color:var(--p700);
+      box-shadow:0 8px 28px rgba(0,0,0,.18);
+    }
+    .clink.em:hover { box-shadow:0 12px 40px rgba(0,0,0,.28); transform:translateY(-2px); }
+    .clink.gh {
+      border:2px solid rgba(255,255,255,.28); color:#fff;
+    }
+    .clink.gh:hover {
+      border-color:#fff; background:rgba(255,255,255,.1); transform:translateY(-2px);
+    }
+
+    footer {
+      padding:26px 5%;
+      background:var(--p900);
+      text-align:center;
+      border-top:1px solid rgba(255,255,255,.07);
+    }
+    footer p { font-size:.78rem; color:rgba(255,255,255,.38); }
+    footer p span { color:var(--p300); }
+
+    /* ── HIRE MODAL ── */
+    .m-overlay {
+      position:fixed; inset:0; z-index:20000;
+      display:flex; align-items:center; justify-content:center;
+      padding:20px;
+      background:rgba(30,27,75,.55);
+      backdrop-filter:blur(10px);
+      opacity:0; pointer-events:none;
+      transition:opacity .3s ease;
+    }
+    .m-overlay.open {
+      opacity:1; pointer-events:auto;
+    }
+    .m-card {
+      background:#fff;
+      border-radius:28px;
+      width:100%; max-width:480px;
+      padding:40px 36px 32px;
+      position:relative;
+      box-shadow:0 32px 80px rgba(45,27,53,.25);
+      transform:translateY(28px) scale(.96);
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+      overflow:hidden;
+    }
+    .m-overlay.open .m-card {
+      transform:translateY(0) scale(1);
+    }
+    /* decorative blobs inside card */
+    .m-card::before {
+      content:'';
+      position:absolute; top:-60px; right:-60px;
+      width:200px; height:200px; border-radius:50%;
+      background:radial-gradient(circle,var(--p200),transparent 65%);
+      pointer-events:none;
+    }
+    .m-card::after {
+      content:'';
+      position:absolute; bottom:-40px; left:-40px;
+      width:160px; height:160px; border-radius:50%;
+      background:radial-gradient(circle,var(--p100),transparent 65%);
+      pointer-events:none;
+    }
+    .m-close {
+      position:absolute; top:18px; right:18px;
+      width:34px; height:34px; border-radius:50%;
+      background:var(--p100); border:1px solid var(--p200);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.85rem; cursor:pointer; color:var(--p700);
+      transition:all .2s ease; z-index:1;
+    }
+    .m-close:hover { background:var(--p200); transform:rotate(90deg); }
+
+    .m-wave { font-size:2.6rem; margin-bottom:14px; display:block;
+      animation:wave 1.6s ease-in-out infinite; transform-origin:70% 70%; }
+    @keyframes wave {
+      0%,100%{ transform:rotate(0deg); }
+      20%    { transform:rotate(-12deg); }
+      40%    { transform:rotate(12deg); }
+      60%    { transform:rotate(-6deg); }
+      80%    { transform:rotate(6deg); }
+    }
+    .m-ttl {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.6rem; font-weight:800;
+      letter-spacing:-.03em; line-height:1.15;
+      color:var(--text); margin-bottom:8px;
+    }
+    .m-ttl span {
+      background:linear-gradient(135deg,var(--p700),var(--p500));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .m-sub {
+      font-size:.88rem; color:var(--text-3);
+      line-height:1.6; margin-bottom:28px;
+    }
+    .m-status {
+      display:inline-flex; align-items:center; gap:7px;
+      background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.25);
+      padding:5px 12px; border-radius:100px;
+      font-size:.72rem; font-weight:700; color:#16a34a;
+      margin-bottom:26px;
+    }
+    .m-status-dot {
+      width:7px; height:7px; background:#22c55e;
+      border-radius:50%; animation:blink 2s infinite;
+    }
+
+    .m-opts { display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
+    .m-opt {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; padding:16px 18px; border-radius:16px;
+      border:1.5px solid var(--border);
+      background:var(--bg); transition:all .25s ease;
+      text-decoration:none; color:inherit; cursor:pointer;
+    }
+    .m-opt:hover {
+      border-color:var(--border-h);
+      background:var(--p50);
+      transform:translateX(4px);
+      box-shadow:var(--sh-md);
+    }
+    .m-opt-l { display:flex; align-items:center; gap:13px; min-width:0; }
+    .m-ico {
+      width:44px; height:44px; flex-shrink:0;
+      border-radius:13px; display:flex;
+      align-items:center; justify-content:center;
+      font-size:1.25rem; border:1px solid var(--border);
+    }
+    .m-ico.em  { background:linear-gradient(135deg,var(--p100),var(--p50)); }
+    .m-ico.li  { background:linear-gradient(135deg,#dbeafe,#eff6ff); }
+    .m-ico.ph  { background:linear-gradient(135deg,#dcfce7,#f0fdf4); }
+    .m-lbl { font-size:.7rem; font-weight:700; letter-spacing:.06em;
+      text-transform:uppercase; color:var(--text-3); margin-bottom:2px; }
+    .m-val { font-size:.88rem; font-weight:600; color:var(--text);
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .m-arr { font-size:1.1rem; color:var(--p500); flex-shrink:0; transition:transform .2s; }
+    .m-opt:hover .m-arr { transform:translateX(3px) translateY(-3px); }
+
+    .copy-btn {
+      flex-shrink:0; padding:7px 16px; border-radius:100px;
+      background:var(--p700); color:#fff;
+      border:none; font-size:.76rem; font-weight:700;
+      cursor:pointer; transition:all .25s ease;
+      white-space:nowrap;
+    }
+    .copy-btn.copied {
+      background:#16a34a;
+    }
+    .copy-btn:hover { background:var(--p800); transform:scale(1.05); }
+    .copy-btn.copied:hover { background:#15803d; }
+
+    .m-note {
+      text-align:center; font-size:.76rem;
+      color:var(--text-3); line-height:1.55;
+      padding-top:16px; border-top:1px solid var(--border);
+    }
+    .m-note strong { color:var(--p700); }
+
+    /* ── FADE-UP ── */
+    .fu {
+      opacity:0; transform:translateY(28px);
+      transition:opacity .7s ease, transform .7s ease;
+    }
+    .fu.vis { opacity:1; transform:translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:960px){
+      .hero-content { grid-template-columns:1fr; gap:48px; }
+      .about-grid   { grid-template-columns:1fr; gap:40px; }
+      .proj-grid    { grid-template-columns:1fr; }
+      .proj-card.feat { grid-column:span 1; grid-template-columns:1fr; }
+      .skills-grid  { grid-template-columns:1fr 1fr; }
+      .certs-grid   { grid-template-columns:1fr 1fr; }
+      .edu-grid     { grid-template-columns:1fr; }
+      .nav-links    { display:none; }
+    }
+    @media(max-width:600px){
+      .skills-grid  { grid-template-columns:1fr; }
+      .metrics-grid { grid-template-columns:1fr 1fr; }
+      section       { padding:68px 5%; }
+      .proj-card    { padding:22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-bar" id="scrollBar"></div>
+<div class="cursor"      id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">MRB<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#about"     class="active"><span class="tag">01</span> Discovery</a></li>
+      <li><a href="#experience">             <span class="tag">02</span> Delivery</a></li>
+      <li><a href="#projects">               <span class="tag">03</span> Shipped</a></li>
+      <li><a href="#skills">                 <span class="tag">04</span> Arsenal</a></li>
+      <li><a href="#education">              <span class="tag">05</span> Learning</a></li>
+      <li><a href="#contact">                <span class="tag">06</span> Connect</a></li>
+    </ul>
+    <a href="resume.pdf" download class="btn-resume">📄 Resume</a>
+    <button onclick="openEmail()" class="btn-hire">Hire Me ↗</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+
+    <div class="hero-left">
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        Open to PM Roles · Tucson, AZ (Open to Relocation)
+      </div>
+      <h1 class="hero-name">
+        <span class="hl">Muthuvisali</span><br/>Ravichandra Bose
+      </h1>
+      <p class="hero-sub">Product × AI · MBA + MS-MIS · 2+ Years Enterprise PM Experience</p>
+      <p class="hero-desc">
+        I ship products that eliminate friction, drive adoption, and move metrics. From
+        zero-to-one AI platforms to B2B SaaS at enterprise scale — I bring data, empathy,
+        and structure to the hardest product problems.
+      </p>
+      <div class="hero-ctas">
+        <a href="#experience" class="btn-primary">View My Work →</a>
+        <a href="#" onclick="openEmail(event)" class="btn-outline">Get in Touch</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="metrics-lbl">Impact Metrics</div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-ico">🖱️</span>
+          <div class="metric-val" data-target="100" data-suffix="K+">0<span>K+</span></div>
+          <div class="metric-lbl">Daily clicks eliminated via workflow automation</div>
+        </div>
+        <div class="metric-card">
+          <span class="metric-ico">⚡</span>
+          <div class="metric-val" data-target="50" data-suffix="%">0<span>%</span></div>
+          <div class="metric-lbl">API latency reduction through clear engineering specs</div>
+        </div>
+        <div class="metric-card">
+          <span class="metric-ico">🛡️</span>
+          <div class="metric-val" data-target="40" data-suffix="%">0<span>%</span></div>
+          <div class="metric-lbl">Platform stability improvement in CRM systems</div>
+        </div>
+        <div class="metric-card">
+          <span class="metric-ico">🧪</span>
+          <div class="metric-val" data-target="95" data-suffix="%">0<span>%</span></div>
+          <div class="metric-lbl">Test coverage achieved via automation workflows</div>
+        </div>
+      </div>
+      <div class="ticker-wrap">
+        <div class="ticker">
+          <span class="t-item"><span class="t-dot"></span>Product Roadmapping</span>
+          <span class="t-item"><span class="t-dot"></span>Agile &amp; Scrum</span>
+          <span class="t-item"><span class="t-dot"></span>SQL Analytics</span>
+          <span class="t-item"><span class="t-dot"></span>User Research</span>
+          <span class="t-item"><span class="t-dot"></span>A/B Testing</span>
+          <span class="t-item"><span class="t-dot"></span>JIRA &amp; Confluence</span>
+          <span class="t-item"><span class="t-dot"></span>Figma</span>
+          <span class="t-item"><span class="t-dot"></span>LLMs &amp; AI Platforms</span>
+          <span class="t-item"><span class="t-dot"></span>KPI Tracking</span>
+          <span class="t-item"><span class="t-dot"></span>OKR Management</span>
+          <span class="t-item"><span class="t-dot"></span>Product Roadmapping</span>
+          <span class="t-item"><span class="t-dot"></span>Agile &amp; Scrum</span>
+          <span class="t-item"><span class="t-dot"></span>SQL Analytics</span>
+          <span class="t-item"><span class="t-dot"></span>User Research</span>
+          <span class="t-item"><span class="t-dot"></span>A/B Testing</span>
+          <span class="t-item"><span class="t-dot"></span>JIRA &amp; Confluence</span>
+          <span class="t-item"><span class="t-dot"></span>Figma</span>
+          <span class="t-item"><span class="t-dot"></span>LLMs &amp; AI Platforms</span>
+          <span class="t-item"><span class="t-dot"></span>KPI Tracking</span>
+          <span class="t-item"><span class="t-dot"></span>OKR Management</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="sec-inner">
+    <div class="sec-tag">About Me</div>
+    <h2 class="sec-title">The PM Behind<br/>the <span class="ac">Numbers</span></h2>
+
+    <div class="about-grid">
+      <div class="about-text fu">
+        <p>
+          I'm a product manager who sits at the intersection of <strong>data, technology, and human behavior</strong>. My journey from Electronics &amp; Communication Engineering to enterprise-scale B2B SaaS gave me a rare ability to speak fluently with both engineers and executives.
+        </p>
+        <p>
+          At Cognizant, I owned full product strategy for a B2B SaaS platform — defining roadmaps, writing specs, running SQL-driven analysis, and aligning cross-functional teams from discovery to delivery. I don't just track KPIs; I design the systems that surface insights worth acting on.
+        </p>
+        <p>
+          Currently pursuing my <strong>MBA + MS-MIS at the University of Arizona</strong>, I'm deepening my strategy and data science toolkit while leading an AI-powered educational platform from zero to one — because the best PMs never stop shipping.
+        </p>
+        <ul class="contact-list">
+          <li><div class="ci">✉️</div><a href="#" onclick="openEmail(event)">visaliravi4@gmail.com</a></li>
+          <li><div class="ci">🔗</div><a href="https://linkedin.com/in/muthuvisali-ravi" target="_blank">linkedin.com/in/muthuvisali-ravi</a></li>
+          <li><div class="ci">📞</div><span>+1 520-286-1560</span></li>
+          <li><div class="ci">📍</div><span>Tucson, AZ · Open to Relocation</span></li>
+        </ul>
+      </div>
+
+      <div class="fu" style="transition-delay:.15s">
+        <div class="pm-box">
+          <h3>My PM Philosophy</h3>
+          <div class="fw-item">
+            <div class="fw-num">01</div>
+            <div>
+              <h4>Discover Before You Define</h4>
+              <p>Every roadmap starts with ruthless user research and SQL-driven data exploration — not assumptions.</p>
+            </div>
+          </div>
+          <div class="fw-item">
+            <div class="fw-num">02</div>
+            <div>
+              <h4>Spec for Speed, Not Perfection</h4>
+              <p>Clear requirements documentation is the multiplier for engineering velocity. I cut API latency by 50% with better specs.</p>
+            </div>
+          </div>
+          <div class="fw-item">
+            <div class="fw-num">03</div>
+            <div>
+              <h4>Metrics Are the Product</h4>
+              <p>KPIs, OKRs, and adoption funnels aren't afterthoughts — they're baked into every feature from day one.</p>
+            </div>
+          </div>
+          <div class="fw-item">
+            <div class="fw-num">04</div>
+            <div>
+              <h4>Align, Then Accelerate</h4>
+              <p>Cross-functional trust is built through transparency — stakeholder-aligned milestones, not surprise launches.</p>
+            </div>
+          </div>
+        </div>
+        <div class="award fu" style="transition-delay:.28s">
+          <div class="award-ico">🏆</div>
+          <div>
+            <div class="award-ttl">Coral Award — Best Young Mind</div>
+            <div class="award-dsc">Recognized for leadership, creativity and problem solving in delivering impactful technology solutions at Cognizant.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="sec-inner">
+    <div class="sec-tag">Work Experience</div>
+    <h2 class="sec-title">2+ Years Shipping<br/><span class="ac">Enterprise Products</span></h2>
+
+    <div class="timeline">
+
+      <div class="exp-item fu">
+        <div class="exp-dot-col"><div class="exp-dot">🔬</div></div>
+        <div class="exp-card">
+          <div class="exp-hd">
+            <div class="exp-tg">
+              <h3>Graduate Research Assistant</h3>
+              <div class="exp-co">University of Arizona · Tucson, AZ</div>
+            </div>
+            <div class="exp-bg">
+              <span class="exp-date">Aug 2025 – Present</span>
+              <span class="exp-type">Current</span>
+            </div>
+          </div>
+          <ul class="exp-list">
+            <li>Built a <strong>12-year longitudinal dataset (5,000+ records, 37 variables)</strong> using Python and pandas, applying data cleaning, feature engineering, and time-series aggregation to support faculty behavioral research.</li>
+            <li>Created <strong>10+ publication-quality visualizations</strong> — dual-axis time series, correlation heatmaps, and event study charts using matplotlib and seaborn for faculty analysis and stakeholder reporting.</li>
+          </ul>
+          <div class="chips">
+            <span class="chip">Python</span>
+            <span class="chip">pandas</span>
+            <span class="chip">matplotlib</span>
+            <span class="chip">seaborn</span>
+            <span class="chip">Time-Series Analysis</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-item fu" style="transition-delay:.05s">
+        <div class="exp-dot-col"><div class="exp-dot">🎓</div></div>
+        <div class="exp-card">
+          <div class="exp-hd">
+            <div class="exp-tg">
+              <h3>Graduate Teaching Assistant</h3>
+              <div class="exp-co">University of Arizona · Tucson, AZ</div>
+            </div>
+            <div class="exp-bg">
+              <span class="exp-date">Aug 2025 – Present</span>
+              <span class="exp-type">Current</span>
+            </div>
+          </div>
+          <ul class="exp-list">
+            <li>Supported course delivery by grading assignments, proctoring exams, and providing constructive feedback to <strong>Business Analytics</strong> undergrad students.</li>
+            <li>Worked with the MBA admin team on the <strong>one-year MBA STEM accreditation</strong> process and coordinated outreach for online programs across university departments.</li>
+          </ul>
+          <div class="chips">
+            <span class="chip">Business Analytics</span>
+            <span class="chip">STEM Accreditation</span>
+            <span class="chip">Curriculum Support</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-item fu" style="transition-delay:.1s">
+        <div class="exp-dot-col"><div class="exp-dot">🚀</div></div>
+        <div class="exp-card">
+          <div class="exp-hd">
+            <div class="exp-tg">
+              <h3>Associate</h3>
+              <div class="exp-co">Cognizant Technology Solutions</div>
+            </div>
+            <div class="exp-bg">
+              <span class="exp-date">Jun 2023 – Jun 2025</span>
+              <span class="exp-type">Full-Time</span>
+            </div>
+          </div>
+          <ul class="exp-list">
+            <li>Owned <strong>end-to-end product strategy</strong> for a B2B SaaS platform serving enterprise clients, eliminating <strong>100,000+ daily clicks</strong> through workflow automation and delivering measurable improvements in operational efficiency and ROI.</li>
+            <li>Cut <strong>API latency by 50%</strong> by defining clear engineering requirements and technical specs, then synthesizing findings into actionable documentation that aligned cross-functional teams across the full SDLC.</li>
+            <li>Ran <strong>SQL-driven data analysis</strong> to monitor activation, adoption and retention KPIs, surfacing product insights that directly shaped <strong>3 feature improvements</strong> and drove measurable QoQ growth in product adoption.</li>
+            <li>Led <strong>Agile and Scrum delivery</strong> across JIRA, translating BRDs and user stories into a prioritized product roadmap and keeping stakeholder-aligned milestones on track through every sprint.</li>
+          </ul>
+          <div class="chips">
+            <span class="chip">100K+ Clicks Eliminated</span>
+            <span class="chip">50% Latency Reduction</span>
+            <span class="chip">3 Feature Improvements</span>
+            <span class="chip">B2B SaaS</span>
+            <span class="chip">Agile / Scrum</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-item fu" style="transition-delay:.2s">
+        <div class="exp-dot-col"><div class="exp-dot">🛠️</div></div>
+        <div class="exp-card">
+          <div class="exp-hd">
+            <div class="exp-tg">
+              <h3>Programmer Analyst</h3>
+              <div class="exp-co">Cognizant Technology Solutions</div>
+            </div>
+            <div class="exp-bg">
+              <span class="exp-date">Jul 2021 – May 2023</span>
+              <span class="exp-type">Full-Time</span>
+            </div>
+          </div>
+          <ul class="exp-list">
+            <li>Raised <strong>CRM platform stability by 40%</strong> by designing and implementing automated workflows across IT operations, significantly reducing manual overhead and improving overall service reliability.</li>
+            <li>Standardized over <strong>20 PRDs and BRDs</strong>, improving the consistency and clarity of engineering documentation and accelerating sprint delivery timelines across Agile teams.</li>
+            <li>Applied analytical thinking and structured problem solving to manage competing priorities across multiple workstreams, delivering sprint outcomes reliably through close cross-functional collaboration.</li>
+          </ul>
+          <div class="chips">
+            <span class="chip">40% Stability Gain</span>
+            <span class="chip">20+ PRDs/BRDs</span>
+            <span class="chip">CRM Platforms</span>
+            <span class="chip">Workflow Automation</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-item fu" style="transition-delay:.3s">
+        <div class="exp-dot-col"><div class="exp-dot">💡</div></div>
+        <div class="exp-card">
+          <div class="exp-hd">
+            <div class="exp-tg">
+              <h3>Programmer Analyst Trainee</h3>
+              <div class="exp-co">Cognizant Technology Solutions</div>
+            </div>
+            <div class="exp-bg">
+              <span class="exp-date">Feb 2021 – Jun 2021</span>
+              <span class="exp-type">Internship</span>
+            </div>
+          </div>
+          <ul class="exp-list">
+            <li>Developed automation workflows that pushed <strong>testing coverage to 95%</strong>, strengthening software release quality and building a strong foundation in product lifecycle management across the SDLC.</li>
+          </ul>
+          <div class="chips">
+            <span class="chip">95% Test Coverage</span>
+            <span class="chip">Test Automation</span>
+            <span class="chip">SDLC</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="sec-inner">
+    <div class="sec-tag">Projects</div>
+    <h2 class="sec-title">From Zero to One —<br/><span class="ac">What I've Shipped</span></h2>
+
+    <div class="proj-grid">
+
+      <!-- Featured -->
+      <div class="proj-card feat fu">
+        <div>
+          <div class="proj-lbl on"><span class="lbl-dot"></span>Ongoing · Product Lead</div>
+          <h3>AI-Enabled Educational Platform</h3>
+          <div class="proj-role">University of Arizona · Zero to One</div>
+          <p>
+            Leading an AI and LLM-powered educational platform from ideation through launch — defining user stories, UX flows, and product workflows while managing a cross-functional Agile team. Integrating NLP features through structured user research and requirements gathering, tracking KPIs and OKRs toward stakeholder-aligned outcomes.
+          </p>
+          <p>
+            Applying data science methods and mentoring junior team members to accelerate product discovery and validation cycles. Full-stack PM work: strategy, execution, and people leadership under one roof.
+          </p>
+          <div class="ptags">
+            <span class="ptag">LLMs</span>
+            <span class="ptag">NLP</span>
+            <span class="ptag">User Research</span>
+            <span class="ptag">Agile</span>
+            <span class="ptag">OKR Tracking</span>
+            <span class="ptag">UX Design</span>
+            <span class="ptag">Team Leadership</span>
+          </div>
+        </div>
+        <div class="proj-vis">
+          <div class="krow">
+            <div class="krow-lbl">User Story Completion</div>
+            <div class="kbar-bg"><div class="kbar" data-w="78"></div></div>
+            <div class="kval">78% Sprint Velocity</div>
+          </div>
+          <div class="krow">
+            <div class="krow-lbl">NLP Feature Integration</div>
+            <div class="kbar-bg"><div class="kbar" data-w="65"></div></div>
+            <div class="kval">In Active Development</div>
+          </div>
+          <div class="krow">
+            <div class="krow-lbl">Team Mentorship Coverage</div>
+            <div class="kbar-bg"><div class="kbar" data-w="100"></div></div>
+            <div class="kval">Full Junior Team Support</div>
+          </div>
+          <div class="krow">
+            <div class="krow-lbl">Stakeholder Alignment</div>
+            <div class="kbar-bg"><div class="kbar" data-w="90"></div></div>
+            <div class="kval">OKRs On Track</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-card fu" style="transition-delay:.1s">
+        <div class="proj-lbl done"><span class="lbl-dot"></span>Completed · Work Plan Manager</div>
+        <h3>Traffic Safety Consulting</h3>
+        <div class="proj-role">University of Arizona · Consulting Project</div>
+        <p>
+          Managed cross-functional workplans using structured business analysis and decision support frameworks to deliver data-driven consulting recommendations. Improved workflow efficiency and delivery timelines against defined project milestones through disciplined project management.
+        </p>
+        <div class="ptags">
+          <span class="ptag">Business Analysis</span>
+          <span class="ptag">Decision Support</span>
+          <span class="ptag">Cross-Functional</span>
+          <span class="ptag">Data-Driven</span>
+        </div>
+      </div>
+
+      <div class="proj-card fu" style="transition-delay:.2s">
+        <div class="proj-lbl done"><span class="lbl-dot"></span>Completed · Team Lead</div>
+        <h3>Microsoft Games Data &amp; Analytics Platform</h3>
+        <div class="proj-role">Data &amp; Product Analytics</div>
+        <p>
+          Built SQL models and delivered Tableau dashboards tracking product KPIs and industry trends. Provided actionable insights that supported data-driven decision making and improved product metrics across the team — bridging the gap between raw data and strategic action.
+        </p>
+        <div class="ptags">
+          <span class="ptag">SQL</span>
+          <span class="ptag">Tableau</span>
+          <span class="ptag">KPI Dashboards</span>
+          <span class="ptag">Product Analytics</span>
+          <span class="ptag">Industry Trends</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="sec-inner">
+    <div class="sec-tag">Skills &amp; Toolkit</div>
+    <h2 class="sec-title">The Full PM<br/><span class="ac">Arsenal</span></h2>
+
+    <div class="skills-grid">
+      <div class="sg fu">
+        <div class="sg-hd">
+          <div class="sg-ico">🗺️</div>
+          <div class="sg-ttl">Product Management</div>
+        </div>
+        <div class="pills">
+          <span class="pill">Product Roadmapping</span>
+          <span class="pill">Product Strategy</span>
+          <span class="pill">Market Analysis</span>
+          <span class="pill">Competitive Analysis</span>
+          <span class="pill">A/B Testing</span>
+          <span class="pill">KPI Tracking</span>
+          <span class="pill">User Research</span>
+          <span class="pill">Requirements Gathering</span>
+          <span class="pill">Product Discovery</span>
+          <span class="pill">OKR Management</span>
+        </div>
+      </div>
+
+      <div class="sg fu" style="transition-delay:.1s">
+        <div class="sg-hd">
+          <div class="sg-ico">⚙️</div>
+          <div class="sg-ttl">AI &amp; Technical Tools</div>
+        </div>
+        <div class="pills">
+          <span class="pill">SQL</span>
+          <span class="pill">Python</span>
+          <span class="pill">pandas</span>
+          <span class="pill">matplotlib</span>
+          <span class="pill">seaborn</span>
+          <span class="pill">Tableau</span>
+          <span class="pill">Excel</span>
+          <span class="pill">JIRA</span>
+          <span class="pill">Confluence</span>
+          <span class="pill">Figma</span>
+          <span class="pill">AI Platforms</span>
+          <span class="pill">Large Language Models</span>
+        </div>
+      </div>
+
+      <div class="sg fu" style="transition-delay:.2s">
+        <div class="sg-hd">
+          <div class="sg-ico">🧠</div>
+          <div class="sg-ttl">Strategy &amp; Consulting</div>
+        </div>
+        <div class="pills">
+          <span class="pill">Strategic Analysis</span>
+          <span class="pill">Management Consulting</span>
+          <span class="pill">Solution Engineering</span>
+          <span class="pill">Product Marketing</span>
+          <span class="pill">Presentation Skills</span>
+          <span class="pill">Cross-Functional Collab</span>
+          <span class="pill">Stakeholder Management</span>
+          <span class="pill">Business Analysis</span>
+          <span class="pill">Decision Support</span>
+          <span class="pill">Leadership</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-tag" style="margin-top:52px">Certifications</div>
+    <div class="certs-grid fu">
+      <div class="cert">
+        <div class="cert-ico">🔐</div>
+        <div class="cert-nm">SAFe 6 Practitioner</div>
+        <div class="cert-og">Scaled Agile</div>
+      </div>
+      <div class="cert">
+        <div class="cert-ico">🗄️</div>
+        <div class="cert-nm">Data Manipulation in SQL</div>
+        <div class="cert-og">DataCamp</div>
+      </div>
+      <div class="cert">
+        <div class="cert-ico">☁️</div>
+        <div class="cert-nm">Azure Fundamentals</div>
+        <div class="cert-og">Microsoft · AZ-900</div>
+      </div>
+      <div class="cert">
+        <div class="cert-ico">📦</div>
+        <div class="cert-nm">Product Management First Steps</div>
+        <div class="cert-og">LinkedIn Learning</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="sec-inner">
+    <div class="sec-tag">Education</div>
+    <h2 class="sec-title">Where Strategy<br/><span class="ac">Meets Systems</span></h2>
+
+    <div class="edu-grid">
+      <div class="edu-card fu">
+        <div class="edu-logo">🐻</div>
+        <h3>University of Arizona, Eller College of Management</h3>
+        <div class="edu-deg">MBA, Business Administration + M.S. Management Information Systems</div>
+        <div class="edu-per">Tucson, AZ · 2025 – Present</div>
+        <div class="edu-tags">
+          <span class="edu-tag">Applied Business Statistics</span>
+          <span class="edu-tag">Business Strategy</span>
+          <span class="edu-tag">Enterprise Data Management</span>
+          <span class="edu-tag">Big Data Technologies</span>
+          <span class="edu-tag">Business Data Communications</span>
+          <span class="edu-tag">Marketing of Innovations</span>
+        </div>
+      </div>
+
+      <div class="edu-card fu" style="transition-delay:.12s">
+        <div class="edu-logo">🏛️</div>
+        <h3>SNS College of Technology</h3>
+        <div class="edu-deg">B.E. Electronics and Communication Engineering</div>
+        <div class="edu-per">India · Graduated 2021</div>
+        <div class="edu-tags">
+          <span class="edu-tag">Electronics Engineering</span>
+          <span class="edu-tag">Communication Systems</span>
+          <span class="edu-tag">Signal Processing</span>
+          <span class="edu-tag">Circuit Design</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="sec-inner">
+    <div class="contact-cta">
+      <div class="sec-tag" style="justify-content:center;margin-bottom:20px">Let's Connect</div>
+      <h2>Ready to Build<br/><span>Something Great?</span></h2>
+      <p>I'm actively looking for Product Manager roles where I can bring data-driven decision making, Agile execution, and genuine user empathy to a team that ships things that matter.</p>
+      <div class="clinks">
+        <a href="#" onclick="openEmail(event)"                          class="clink em">✉️ visaliravi4@gmail.com</a>
+        <a href="https://linkedin.com/in/muthuvisali-ravi" target="_blank" class="clink gh">🔗 LinkedIn Profile</a>
+        <a href="tel:+15202861560"                                      class="clink gh">📞 +1 520-286-1560</a>
+        <a href="resume.pdf" download                                   class="clink gh">📄 Download Resume</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Designed &amp; built with intention · <span>Muthuvisali Ravichandra Bose</span> · Product Manager</p>
+</footer>
+
+<!-- HIRE MODAL -->
+<div class="m-overlay" id="hireModal" onclick="handleOverlayClick(event)">
+  <div class="m-card" id="mCard">
+    <button class="m-close" onclick="closeModal()" aria-label="Close">✕</button>
+
+    <span class="m-wave">👋</span>
+    <h2 class="m-ttl">Let's Build<br/><span>Something Great</span></h2>
+    <p class="m-sub">Pick any channel — I'm responsive on all of them and happy to jump on a quick call.</p>
+
+    <div class="m-status">
+      <span class="m-status-dot"></span>
+      Available · Actively Looking · Open to Relocation
+    </div>
+
+    <div class="m-opts">
+      <!-- Email row -->
+      <div class="m-opt" onclick="openEmail(event)" style="cursor:pointer;">
+        <div class="m-opt-l">
+          <div class="m-ico em">✉️</div>
+          <div>
+            <div class="m-lbl">Email — opens mail app</div>
+            <div class="m-val">visaliravi4@gmail.com</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="copy-btn" id="copyBtn" onclick="copyEmail(event)">Copy</button>
+          <span class="m-arr">↗</span>
+        </div>
+      </div>
+
+      <!-- LinkedIn row -->
+      <a class="m-opt" href="https://linkedin.com/in/muthuvisali-ravi" target="_blank" rel="noopener">
+        <div class="m-opt-l">
+          <div class="m-ico li">🔗</div>
+          <div>
+            <div class="m-lbl">LinkedIn</div>
+            <div class="m-val">muthuvisali-ravi</div>
+          </div>
+        </div>
+        <span class="m-arr">↗</span>
+      </a>
+
+      <!-- Phone row -->
+      <a class="m-opt" href="tel:+15202861560">
+        <div class="m-opt-l">
+          <div class="m-ico ph">📞</div>
+          <div>
+            <div class="m-lbl">Phone</div>
+            <div class="m-val">+1 520-286-1560</div>
+          </div>
+        </div>
+        <span class="m-arr">↗</span>
+      </a>
+    </div>
+
+    <p class="m-note">⚡ Usually replies within <strong>24 hours</strong> · Tucson, AZ · Open to remote &amp; hybrid roles</p>
+  </div>
+</div>
+
+<script>
+  /* ── HIRE MODAL ── */
+  const modal = document.getElementById('hireModal');
+
+  function openModal() {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copy';
+    btn.classList.remove('copied');
+  }
+  function handleOverlayClick(e) {
+    if(e.target === modal) closeModal();
+  }
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') closeModal();
+  });
+  function copyEmail(e) {
+    e.stopPropagation();
+    navigator.clipboard.writeText('visaliravi4@gmail.com').then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2200);
+    });
+  }
+  function openEmail(e) {
+    if (e) e.stopPropagation();
+    const subject = "Let's Talk — PM Opportunity for Muthuvisali";
+    // const body = [
+    //   "Hi Muthuvisali,",
+    //   "",
+    //   "I just went through your portfolio and I have to say — your work stands out.",
+    //   "",
+    //   "Your ability to blend AI product strategy with data-driven execution and genuine",
+    //   "user empathy is exactly what we're looking for at [Company].",
+    //   "",
+    //   "A few things I'd love to explore with you:",
+    //   "  → Your experience leading cross-functional AI initiatives",
+    //   "  → How you've turned ambiguous problems into shipped solutions",
+    //   "  → What motivates you to build products that truly matter",
+    //   "",
+    //   "I believe you'd be a phenomenal fit for [Role/Team] and I'd love to connect.",
+    //   "",
+    //   "Would you have 20–30 minutes this week for a quick intro call?",
+    //   "",
+    //   "Looking forward to it!",
+    //   "",
+    //   "Warm regards,",
+    //   "[Your Name]",
+    //   "[Title] | [Company]",
+    //   "[Phone / LinkedIn]"
+    // ].join("\n");
+    window.location.href =
+      "mailto:visaliravi4@gmail.com" +
+      "?subject=" + encodeURIComponent(subject)
+  }
+
+  /* ── CURSOR ── */
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cur.style.transform = `translate(${mx-5}px,${my-5}px)`;
+  });
+  (function animRing(){
+    rx += (mx-rx)*.12; ry += (my-ry)*.12;
+    ring.style.transform = `translate(${rx-18}px,${ry-18}px)`;
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,.pill,.cert').forEach(el => {
+    el.addEventListener('mouseenter',()=>{ ring.style.width='58px'; ring.style.height='58px'; ring.style.borderColor='rgba(61,38,69,.55)'; cur.style.opacity='0'; });
+    el.addEventListener('mouseleave',()=>{ ring.style.width='36px'; ring.style.height='36px'; ring.style.borderColor='rgba(61,38,69,.35)'; cur.style.opacity='1'; });
+  });
+
+  /* ── SCROLL PROGRESS ── */
+  const sb = document.getElementById('scrollBar');
+  window.addEventListener('scroll', () => {
+    sb.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+  });
+
+  /* ── FADE-UP ── */
+  const fuObs = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
+  }, { threshold: .1 });
+  document.querySelectorAll('.fu').forEach(el => fuObs.observe(el));
+
+  /* ── COUNTER ANIMATION ── */
+  function animCount(el, target, suffix) {
+    let start; const dur = 1800;
+    const step = ts => {
+      if(!start) start = ts;
+      const p = Math.min((ts-start)/dur, 1);
+      const eased = 1 - Math.pow(1-p, 3);
+      el.innerHTML = Math.round(eased*target) + '<span>' + suffix + '</span>';
+      if(p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  const cntObs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting){
+        const el = e.target;
+        animCount(el, +el.dataset.target, el.dataset.suffix);
+        cntObs.unobserve(el);
+      }
+    });
+  }, { threshold: .5 });
+  document.querySelectorAll('.metric-val[data-target]').forEach(el => cntObs.observe(el));
+
+  /* ── KPI BARS ── */
+  const barObs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting){
+        e.target.querySelectorAll('.kbar').forEach(b => {
+          b.style.width = b.dataset.w + '%';
+        });
+      }
+    });
+  }, { threshold: .3 });
+  document.querySelectorAll('.proj-card').forEach(c => barObs.observe(c));
+
+  /* ── ACTIVE NAV ── */
+  const navAs = document.querySelectorAll('.nav-links a');
+  const navObs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting){
+        navAs.forEach(a => a.classList.remove('active'));
+        const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if(a) a.classList.add('active');
+      }
+    });
+  }, { threshold: .38 });
+  document.querySelectorAll('section[id]').forEach(s => navObs.observe(s));
+</script>
+</body>
+</html>
