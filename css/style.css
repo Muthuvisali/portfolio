@@ -379,10 +379,9 @@ nav::before {
   color:var(--text); word-break:break-word;
 }
 .hero-name .hl {
-  background:linear-gradient(135deg,var(--p700) 0%,var(--gold) 70%,#E8C4D4 100%);
+  background:linear-gradient(135deg,var(--p700) 0%,var(--E8C4D4) 70%,#E8C4D4 100%);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   background-clip:text; display:inline-block;
-  filter:drop-shadow(0 2px 8px rgba(107,61,90,.2));
 }
 
 .hero-sub {
