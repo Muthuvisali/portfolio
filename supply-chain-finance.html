@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multi-Agent Supply Chain Finance — Muthuvisali Ravichandra Bose</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #F5EDE8; --bg-alt: #EDD9CF;
+      --text: #2D1B35; --text-2: #3D2645; --text-3: #6B3D5A; --muted: #C4A8B8;
+      --p50:#FBF5F8; --p100:#F5E8EF; --p200:#E8C4D4; --p300:#D4A0BE;
+      --p400:#A87898; --p500:#8B4F7A; --p600:#6B3D5A; --p700:#3D2645;
+      --p800:#2D1B35; --p900:#1A0F20;
+      --gold:#C4956A; --gold-h:#A87858;
+      --border:rgba(232,196,212,0.45); --border-h:rgba(107,61,90,0.5);
+      --sh-sm:0 2px 8px rgba(45,27,53,0.07);
+      --sh-md:0 8px 30px rgba(45,27,53,0.11);
+      --sh-lg:0 20px 60px rgba(45,27,53,0.14);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+    /* SCROLL BAR */
+    .scroll-bar { position:fixed; top:0; left:0; height:3px; width:0; background:linear-gradient(90deg,var(--gold),var(--p400)); z-index:10000; transition:width .1s linear; }
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:1000; padding:0 5%; background:rgba(26,15,32,0.94); backdrop-filter:blur(24px) saturate(160%); border-bottom:1px solid rgba(232,196,212,.1); }
+    .nav-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:66px; gap:16px; }
+    .nav-logo { font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:1.1rem; color:#fff; text-decoration:none; letter-spacing:-.02em; flex-shrink:0; }
+    .nav-logo span { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-back { display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.65); font-size:.78rem; font-weight:600; text-decoration:none; letter-spacing:.03em; padding:7px 14px; border-radius:100px; border:1px solid rgba(255,255,255,.15); transition:all .25s ease; white-space:nowrap; }
+    .nav-back:hover { color:#fff; background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3); }
+    .nav-actions { display:flex; align-items:center; gap:10px; }
+    .btn-nav-gh { display:inline-flex; align-items:center; gap:6px; font-size:.78rem; padding:8px 16px; background:transparent; color:rgba(255,255,255,.75); border:1.5px solid rgba(255,255,255,.25); border-radius:100px; font-weight:700; cursor:pointer; transition:all .3s ease; font-family:'Inter',sans-serif; }
+    .btn-nav-gh:hover { background:rgba(255,255,255,.1); color:#fff; border-color:rgba(255,255,255,.5); transform:translateY(-2px); }
+    .btn-nav-demo { display:inline-flex; align-items:center; gap:6px; font-size:.78rem; padding:9px 18px; background:linear-gradient(135deg,var(--gold),var(--gold-h)); color:#fff; border:none; border-radius:100px; font-weight:700; cursor:pointer; transition:all .3s ease; font-family:'Inter',sans-serif; box-shadow:0 4px 16px rgba(196,149,106,.4); }
+    .btn-nav-demo:hover { transform:translateY(-2px) scale(1.03); box-shadow:0 8px 28px rgba(196,149,106,.55); }
+
+    /* HERO */
+    #hero { min-height:72vh; display:flex; align-items:center; position:relative; overflow:hidden; padding:110px 5% 80px; background:linear-gradient(155deg,var(--p900) 0%,var(--p700) 60%,var(--p600) 100%); }
+    .hero-orb { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; }
+    .hero-orb-1 { width:520px; height:520px; background:radial-gradient(circle,rgba(196,149,106,.28),transparent 70%); top:-150px; right:-100px; animation:floatOrb 8s ease-in-out infinite; }
+    .hero-orb-2 { width:360px; height:360px; background:radial-gradient(circle,rgba(232,196,212,.12),transparent 70%); bottom:-80px; left:5%; animation:floatOrb 8s ease-in-out infinite; animation-delay:-4s; }
+    @keyframes floatOrb { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-28px) scale(1.06);} }
+    .hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.05) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    .hero-content { max-width:1000px; margin:0 auto; position:relative; z-index:2; width:100%; text-align:center; }
+    .hero-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(196,149,106,.15); border:1px solid rgba(196,149,106,.3); padding:6px 18px; border-radius:100px; font-size:.72rem; color:var(--gold); font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:28px; }
+    .hero-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(2rem,4.5vw,3.8rem); font-weight:800; line-height:1.1; letter-spacing:-.03em; margin-bottom:18px; color:#fff; }
+    .hero-title .hl { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-sub { font-size:1rem; color:rgba(255,255,255,.65); max-width:680px; margin:0 auto 36px; line-height:1.75; }
+    .hero-stats { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:40px; }
+    .h-stat { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:8px 18px; font-size:.78rem; font-weight:600; color:rgba(255,255,255,.8); }
+    .h-stat strong { color:var(--gold); }
+    .hero-btns { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+    .btn-hero-gh { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:100px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; transition:all .3s ease; }
+    .btn-hero-gh:hover { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.45); transform:translateY(-3px); }
+    .btn-hero-demo { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:100px; background:linear-gradient(135deg,var(--gold),var(--gold-h)); color:#fff; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; transition:all .3s ease; box-shadow:0 6px 24px rgba(196,149,106,.45); border:none; }
+    .btn-hero-demo:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 12px 36px rgba(196,149,106,.6); }
+
+    /* SECTIONS */
+    section.light { background:#fff; }
+    section.cream { background:var(--bg); }
+    section.dark { background:linear-gradient(155deg,var(--p900) 0%,var(--p700) 65%,var(--p500) 100%); position:relative; overflow:hidden; }
+    section.dark::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.04) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    section { padding:88px 5%; }
+    .sec-inner { max-width:1100px; margin:0 auto; position:relative; z-index:1; }
+    .sec-tag { display:inline-flex; align-items:center; gap:8px; font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--p600); margin-bottom:10px; }
+    .sec-tag::before { content:''; width:18px; height:2px; background:var(--gold); border-radius:2px; }
+    .dark .sec-tag { color:rgba(255,255,255,.5); }
+    .sec-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.7rem,3vw,2.5rem); font-weight:800; letter-spacing:-.03em; color:var(--text); margin-bottom:14px; line-height:1.15; }
+    .dark .sec-title { color:#fff; }
+    .sec-title .ac { background:linear-gradient(135deg,var(--p700),var(--p400)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .sec-title .ac-gold { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .sec-lead { font-size:.95rem; color:var(--text-3); line-height:1.85; max-width:740px; margin-bottom:44px; }
+    .dark .sec-lead { color:rgba(255,255,255,.65); }
+
+    /* PROBLEM */
+    .tension-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:32px; }
+    .tension-card { background:var(--bg); border:1px solid var(--border); border-radius:18px; padding:26px; transition:all .3s ease; }
+    .tension-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .t-label { font-size:.66rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+    .tension-card h4 { font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700; color:var(--text); margin-bottom:8px; }
+    .tension-card p { font-size:.83rem; color:var(--text-3); line-height:1.65; }
+    .callout { background:linear-gradient(135deg,var(--p900) 0%,var(--p700) 100%); border-radius:22px; padding:30px 36px; border:1px solid rgba(232,196,212,.12); }
+    .callout-ttl { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; color:#fff; margin-bottom:10px; }
+    .callout p { font-size:.9rem; color:rgba(255,255,255,.7); line-height:1.85; }
+    .callout strong { color:var(--gold); }
+
+    /* PIPELINE */
+    .pipeline-flow { background:#fff; border:1px solid var(--border); border-radius:24px; padding:36px; margin-bottom:44px; display:flex; flex-direction:column; align-items:center; gap:0; }
+    .pipe-in-out { background:var(--p900); color:#fff; border-radius:14px; padding:13px 28px; font-family:'Space Grotesk',sans-serif; font-size:.9rem; font-weight:700; text-align:center; width:100%; max-width:720px; }
+    .pipe-in-out.out { background:linear-gradient(135deg,var(--p700),var(--p500)); }
+    .pipe-arrow { color:var(--p300); font-size:1.1rem; padding:4px 0; }
+    .pipe-row { width:100%; max-width:720px; }
+    .pipe-box { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:13px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; transition:border-color .2s; }
+    .pipe-box:hover { border-color:var(--border-h); }
+    .pipe-box.gov { border-color:rgba(196,149,106,.4); background:rgba(196,149,106,.05); }
+    .pipe-left { display:flex; align-items:center; gap:10px; }
+    .pipe-num { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,var(--p700),var(--p500)); color:#fff; font-size:.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .pipe-num.g { background:linear-gradient(135deg,var(--gold),var(--gold-h)); }
+    .pipe-name { font-family:'Space Grotesk',sans-serif; font-size:.88rem; font-weight:700; color:var(--text); }
+    .pipe-name.g { color:var(--gold); }
+    .pipe-out { font-size:.72rem; color:var(--p600); font-weight:600; background:var(--p100); padding:3px 10px; border-radius:100px; white-space:nowrap; }
+    .pipe-out.g { background:rgba(196,149,106,.12); color:var(--gold); }
+
+    /* AGENT CARDS */
+    .agents-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+    .agent-card { background:#fff; border:1px solid var(--border); border-radius:20px; padding:26px; transition:all .3s ease; position:relative; overflow:hidden; }
+    .agent-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--p700),var(--p400)); transform:scaleX(0); transform-origin:left; transition:transform .35s ease; }
+    .agent-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-4px); }
+    .agent-card:hover::before { transform:scaleX(1); }
+    .agent-card.gov-card { border-color:rgba(196,149,106,.4); background:#fff; }
+    .agent-card.gov-card::before { background:linear-gradient(90deg,var(--gold),var(--gold-h)); }
+    .agent-hd { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .a-num { width:36px; height:36px; border-radius:10px; flex-shrink:0; background:linear-gradient(135deg,var(--p700),var(--p500)); color:#fff; font-size:.78rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .a-num.g { background:linear-gradient(135deg,var(--gold),var(--gold-h)); }
+    .a-name { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; color:var(--text); }
+    .a-name.g { color:var(--gold); }
+    .a-role { font-size:.72rem; color:var(--p600); font-weight:600; margin-top:2px; }
+    .a-list { list-style:none; display:flex; flex-direction:column; gap:7px; margin-bottom:16px; }
+    .a-list li { font-size:.83rem; color:var(--text-3); line-height:1.55; padding-left:14px; position:relative; }
+    .a-list li::before { content:'›'; position:absolute; left:0; color:var(--p400); font-weight:700; }
+    .a-output { display:inline-flex; align-items:center; gap:6px; font-size:.74rem; font-weight:700; color:var(--p700); background:var(--p100); border:1px solid var(--p200); padding:5px 13px; border-radius:100px; }
+    .a-output.g { background:rgba(196,149,106,.1); border-color:rgba(196,149,106,.3); color:var(--gold); }
+
+    /* TECH STACK */
+    .tech-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .tech-card { background:#fff; border:1px solid var(--border); border-radius:20px; padding:26px; transition:all .3s ease; }
+    .tech-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .tech-hd { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .tech-ico { width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,var(--p700),var(--p500)); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .tech-ttl { font-family:'Space Grotesk',sans-serif; font-size:.9rem; font-weight:700; color:var(--text); }
+    .tech-items { display:flex; flex-direction:column; gap:9px; }
+    .tech-item { font-size:.83rem; color:var(--text-3); line-height:1.5; padding-left:14px; position:relative; }
+    .tech-item::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--gold); position:absolute; left:0; top:7px; }
+
+    /* ENTERPRISE GRADE */
+    .ent-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .ent-card { background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:28px; transition:all .3s ease; }
+    .ent-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-4px); }
+    .ent-hd { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .ent-check { width:28px; height:28px; border-radius:8px; background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.25); display:flex; align-items:center; justify-content:center; font-size:.85rem; flex-shrink:0; }
+    .ent-ttl { font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700; color:var(--text); }
+    .ent-list { list-style:none; display:flex; flex-direction:column; gap:7px; }
+    .ent-list li { font-size:.82rem; color:var(--text-3); line-height:1.55; padding-left:14px; position:relative; }
+    .ent-list li::before { content:'›'; position:absolute; left:0; color:var(--p400); font-weight:700; }
+
+    /* DEMO RESULTS */
+    .demo-case { background:var(--p900); border-radius:24px; padding:36px; border:1px solid rgba(232,196,212,.1); }
+    .demo-hd { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; color:var(--gold); margin-bottom:24px; display:flex; align-items:center; gap:10px; }
+    .demo-hd::before { content:''; width:3px; height:22px; background:var(--gold); border-radius:2px; flex-shrink:0; }
+    .demo-agents { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .d-agent { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:18px; }
+    .d-agent.gov { grid-column:span 2; background:rgba(196,149,106,.08); border-color:rgba(196,149,106,.25); }
+    .da-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .da-lbl { font-size:.7rem; font-weight:700; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.08em; }
+    .da-badge { font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:100px; background:rgba(34,197,94,.15); color:#4ade80; border:1px solid rgba(34,197,94,.25); }
+    .da-main { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:800; color:#fff; margin-bottom:5px; }
+    .da-main .conf { font-size:.72rem; font-weight:500; color:rgba(255,255,255,.4); margin-left:8px; }
+    .da-sub { font-size:.8rem; color:rgba(255,255,255,.5); line-height:1.55; }
+    .demo-verdict { margin-top:14px; padding:13px 18px; background:rgba(196,149,106,.15); border:1px solid rgba(196,149,106,.3); border-radius:10px; font-size:.83rem; font-weight:700; color:var(--gold); }
+
+    /* BUSINESS IMPACT */
+    .impact-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+    .impact-card { background:#fff; border:1px solid var(--border); border-radius:20px; padding:28px; transition:all .3s ease; }
+    .impact-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .impact-hd { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .impact-ico { font-size:1.5rem; }
+    .impact-ttl { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; color:var(--text); }
+    .impact-list { list-style:none; display:flex; flex-direction:column; gap:9px; }
+    .impact-list li { font-size:.84rem; color:var(--text-3); line-height:1.6; padding-left:16px; position:relative; }
+    .impact-list li::before { content:'›'; position:absolute; left:0; color:var(--gold); font-weight:700; }
+
+    /* GOVERNANCE LAYER */
+    .gov-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:36px; }
+    .gc { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:18px 20px; display:flex; align-items:flex-start; gap:12px; transition:background .25s ease; }
+    .gc:hover { background:rgba(255,255,255,.1); }
+    .gc-n { width:26px; height:26px; border-radius:8px; flex-shrink:0; background:rgba(196,149,106,.2); border:1px solid rgba(196,149,106,.3); color:var(--gold); font-size:.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .gc-ttl { font-size:.85rem; font-weight:700; color:#fff; margin-bottom:4px; }
+    .gc-desc { font-size:.78rem; color:rgba(255,255,255,.5); line-height:1.55; }
+    .gov-rules { background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:28px 32px; font-family:'Courier New',monospace; font-size:.82rem; }
+    .gr { display:grid; grid-template-columns:1fr auto; gap:16px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+    .gr:last-child { border-bottom:none; }
+    .gr .c { color:#93c5fd; }
+    .gr .r { color:#4ade80; font-weight:700; white-space:nowrap; }
+    .gr.else .c { color:rgba(255,255,255,.35); }
+    .gr.else .r { color:var(--gold); }
+
+    /* LEARNING */
+    .learn-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+    .learn-card { background:#fff; border:1px solid var(--border); border-radius:20px; padding:28px; transition:all .3s ease; }
+    .learn-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .learn-hd { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .l-num { width:36px; height:36px; border-radius:10px; flex-shrink:0; background:linear-gradient(135deg,var(--p700),var(--p500)); color:#fff; font-size:.85rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .l-ttl { font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700; color:var(--text); }
+    .l-tags { display:flex; flex-wrap:wrap; gap:7px; }
+    .l-tag { font-size:.75rem; font-weight:500; color:var(--text-2); background:var(--p50); border:1px solid var(--border); padding:5px 12px; border-radius:100px; }
+
+    /* CTA BOTTOM */
+    #cta { background:var(--p900); padding:80px 5%; text-align:center; position:relative; overflow:hidden; }
+    #cta::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.04) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    .cta-inner { max-width:600px; margin:0 auto; position:relative; z-index:1; }
+    .cta-ttl { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.6rem,3vw,2.5rem); font-weight:800; color:#fff; margin-bottom:12px; letter-spacing:-.03em; }
+    .cta-sub { font-size:.95rem; color:rgba(255,255,255,.5); margin-bottom:36px; line-height:1.75; }
+    .cta-btns { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+
+    /* FOOTER */
+    footer { background:var(--p900); border-top:1px solid rgba(255,255,255,.06); padding:24px 5%; text-align:center; }
+    footer p { font-size:.8rem; color:rgba(255,255,255,.3); }
+    footer a { color:rgba(255,255,255,.5); text-decoration:none; transition:color .2s ease; }
+    footer a:hover { color:#fff; }
+
+    /* SCROLL ANIMATION */
+    .fu { opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s cubic-bezier(.34,1.56,.64,1); }
+    .fu.vis { opacity:1; transform:translateY(0); }
+    .delay-1 { transition-delay:.08s !important; }
+    .delay-2 { transition-delay:.16s !important; }
+    .delay-3 { transition-delay:.24s !important; }
+    .delay-4 { transition-delay:.32s !important; }
+    .delay-5 { transition-delay:.40s !important; }
+
+    /* INVOICE CONTEXT STRIP */
+    .inv-context { display:flex; align-items:center; background:#fff; border:1px solid var(--border); border-radius:16px; padding:20px 28px; gap:0; margin-bottom:32px; flex-wrap:wrap; gap:0; }
+    .inv-field { display:flex; flex-direction:column; gap:4px; padding:0 24px; }
+    .inv-field:first-child { padding-left:0; }
+    .inv-field:last-child { padding-right:0; }
+    .inv-label { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+    .inv-val { font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700; color:var(--text); }
+    .inv-sep { width:1px; height:36px; background:var(--border); flex-shrink:0; }
+
+    /* RESULT GRID */
+    .result-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:24px; }
+    .result-card { background:#fff; border:1px solid var(--border); border-radius:20px; padding:24px; transition:all .3s ease; position:relative; overflow:hidden; }
+    .result-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--p600),var(--p300)); border-radius:20px 20px 0 0; }
+    .result-card.gov-result { grid-column:span 3; border-color:rgba(196,149,106,.4); background:#fff; }
+    .result-card.gov-result::before { background:linear-gradient(90deg,var(--gold),var(--gold-h)); }
+    .result-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .result-card.gov-result:hover { border-color:rgba(196,149,106,.5); }
+    .rc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .rc-num { font-family:'Space Grotesk',sans-serif; font-size:.72rem; font-weight:800; color:var(--muted); letter-spacing:.1em; }
+    .gov-n { color:var(--gold); }
+    .rc-status { font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:100px; }
+    .rc-status.green { background:rgba(34,197,94,.1); color:#16a34a; border:1px solid rgba(34,197,94,.2); }
+    .rc-status.gold { background:rgba(196,149,106,.12); color:var(--gold); border:1px solid rgba(196,149,106,.25); }
+    .rc-agent { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--p600); margin-bottom:8px; }
+    .rc-metric { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; font-weight:800; color:var(--text); line-height:1.1; margin-bottom:8px; }
+    .rc-metric span { font-size:.82rem; font-weight:500; color:var(--muted); }
+    .rc-metric.gov-m { color:var(--gold); font-size:1.7rem; }
+    .rc-desc { font-size:.8rem; color:var(--text-3); line-height:1.65; margin-bottom:16px; }
+    .rc-checks { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .rcc { font-size:.8rem; color:var(--text-3); line-height:1.5; padding-left:16px; position:relative; }
+    .rcc::before { content:'✓'; position:absolute; left:0; color:#16a34a; font-size:.72rem; font-weight:700; }
+    .rc-conf { display:flex; align-items:center; gap:10px; margin-top:auto; }
+    .rc-conf-label { font-size:.66rem; font-weight:600; color:var(--muted); white-space:nowrap; }
+    .rc-conf-track { flex:1; height:4px; background:var(--p100); border-radius:4px; overflow:hidden; }
+    .rc-conf-fill { height:100%; background:linear-gradient(90deg,var(--p600),var(--p400)); border-radius:4px; }
+    .rc-conf-fill.gold-fill { background:linear-gradient(90deg,var(--gold),var(--gold-h)); }
+    .rc-conf-pct { font-size:.72rem; font-weight:700; color:var(--p600); white-space:nowrap; }
+
+    /* VERDICT STRIP */
+    .verdict-strip { background:linear-gradient(135deg,var(--p800),var(--p700)); border-radius:20px; padding:28px 36px; display:flex; align-items:center; gap:0; flex-wrap:wrap; }
+    .vs-left { padding-right:36px; }
+    .vs-label { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.45); margin-bottom:6px; }
+    .vs-decision { font-family:'Space Grotesk',sans-serif; font-size:1.8rem; font-weight:800; color:#fff; letter-spacing:-.02em; }
+    .vs-divider { width:1px; height:48px; background:rgba(255,255,255,.12); margin:0 36px; flex-shrink:0; }
+    .vs-stat { display:flex; flex-direction:column; gap:5px; }
+    .vs-num { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:800; color:var(--gold); }
+    .vs-desc { font-size:.76rem; color:rgba(255,255,255,.5); font-weight:500; }
+
+    /* CASE STUDY BUTTON */
+    .btn-case-study { display:inline-flex; align-items:center; gap:8px; padding:13px 26px; border-radius:100px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.18); color:rgba(255,255,255,.75); font-size:.9rem; font-weight:700; text-decoration:none; font-family:'Inter',sans-serif; transition:all .3s ease; }
+    .btn-case-study:hover { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.35); transform:translateY(-3px); color:#fff; }
+
+    /* ATTRIBUTION BADGE */
+    .attribution { display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; background:rgba(196,149,106,.08); border:1.5px solid rgba(196,149,106,.25); border-radius:14px; padding:14px 22px; margin-bottom:36px; }
+    .attr-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--p600); white-space:nowrap; }
+    .attr-link { display:inline-flex; align-items:center; gap:6px; font-size:.82rem; font-weight:700; color:var(--gold); text-decoration:none; border-bottom:1px solid transparent; transition:border-color .2s ease; }
+    .attr-link:hover { border-bottom-color:var(--gold); }
+    .attr-divider { width:1px; height:16px; background:var(--border); }
+
+    /* COMING SOON MODAL */
+    .modal-overlay { position:fixed; inset:0; z-index:9999; background:rgba(26,15,32,.85); backdrop-filter:blur(14px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .3s ease; }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal-card { background:var(--p900); border:1px solid rgba(232,196,212,.15); border-radius:28px; padding:52px 44px; text-align:center; max-width:440px; width:90%; transform:scale(.9) translateY(20px); transition:transform .35s cubic-bezier(.34,1.56,.64,1); position:relative; }
+    .modal-overlay.open .modal-card { transform:scale(1) translateY(0); }
+    .modal-close { position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.08); border:none; cursor:pointer; color:rgba(255,255,255,.5); font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:all .2s ease; }
+    .modal-close:hover { background:rgba(255,255,255,.15); color:#fff; }
+    .modal-icon { font-size:3.5rem; margin-bottom:20px; display:block; }
+    .modal-ttl { font-family:'Space Grotesk',sans-serif; font-size:1.6rem; font-weight:800; color:#fff; margin-bottom:10px; letter-spacing:-.02em; }
+    .modal-sub { font-size:.88rem; color:rgba(255,255,255,.5); line-height:1.75; margin-bottom:28px; }
+    .modal-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(196,149,106,.12); border:1px solid rgba(196,149,106,.28); padding:9px 20px; border-radius:100px; font-size:.78rem; font-weight:700; color:var(--gold); letter-spacing:.05em; }
+    .m-dot { width:8px; height:8px; border-radius:50%; background:var(--gold); animation:mpulse 1.5s ease-in-out infinite; flex-shrink:0; }
+    @keyframes mpulse { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+    /* RESPONSIVE */
+    @media(max-width:768px) {
+      .tension-grid,.tech-grid,.agents-grid,.impact-grid,.gov-grid { grid-template-columns:1fr; }
+      .result-grid { grid-template-columns:1fr 1fr; }
+      .result-card.gov-result { grid-column:span 2; }
+      .inv-context { gap:16px; flex-direction:column; align-items:flex-start; }
+      .inv-sep { display:none; }
+      .inv-field { padding:0; }
+      .verdict-strip { gap:20px; }
+      .vs-divider { display:none; }
+      section { padding:64px 5%; }
+    }
+    @media(max-width:480px) {
+      .nav-actions { display:none; }
+      .result-grid { grid-template-columns:1fr; }
+      .result-card.gov-result { grid-column:span 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-bar" id="scrollBar"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">MRB<span>.</span></a>
+    <a href="index.html#projects" class="nav-back">← Back to Portfolio</a>
+    <div class="nav-actions">
+      <button class="btn-nav-gh" onclick="showComingSoon('github')">⌥ GitHub</button>
+      <button class="btn-nav-demo" onclick="showComingSoon('demo')">▶ Live Demo</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-content">
+    <div class="hero-tag">🤖 Agentic AI · Inspired by Honeywell × JPMorgan</div>
+    <h1 class="hero-title">
+      Multi-Agent <span class="hl">Supply Chain Finance</span><br/>Optimization Platform
+    </h1>
+    <p class="hero-sub">
+      Enterprise-grade agentic AI for autonomous financial decision-making with policy governance.
+      Six independent agents reason about their domain. One governance layer validates everything. Zero decisions slip through.
+    </p>
+    <div class="hero-stats">
+      <div class="h-stat"><strong>6</strong> Autonomous Agents</div>
+      <div class="h-stat"><strong>$900M+</strong> Honeywell × JPMorgan Scale</div>
+      <div class="h-stat"><strong>Policy-Enforced</strong> Governance</div>
+      <div class="h-stat"><strong>85%</strong> Auto-Approval Rate</div>
+    </div>
+    <div class="hero-btns">
+      <button class="btn-hero-gh" onclick="showComingSoon('github')">⌥ View on GitHub</button>
+      <button class="btn-hero-demo" onclick="showComingSoon('demo')">▶ Live Demo</button>
+      <a href="https://www.jpmorgan.com/insights/treasury/trade-working-capital/honeywell-frees-up-working-capital-with-record-scf-solution" target="_blank" rel="noopener" class="btn-case-study">📎 JPMorgan Case Study ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROBLEM STATEMENT ═══ -->
+<section class="light">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Problem Statement</div>
+    <h2 class="sec-title fu">The Challenge in<br/><span class="ac">Supply Chain Finance</span></h2>
+    <p class="sec-lead fu">
+      Supply chain finance teams make thousands of daily invoicing and payment decisions that directly impact working capital, all while maintaining strict policy compliance. Manual review is slow, error-prone, and doesn't scale. Simple rule engines lack the reasoning capability needed for nuanced supplier scenarios.
+    </p>
+    <div class="attribution fu">
+      <span class="attr-label">Case Study</span>
+      <div class="attr-divider"></div>
+      <a href="https://www.jpmorgan.com/insights/treasury/trade-working-capital/honeywell-frees-up-working-capital-with-record-scf-solution" target="_blank" rel="noopener" class="attr-link">
+        Honeywell × JPMorgan — $900M+ Record SCF Solution ↗
+      </a>
+      <div class="attr-divider"></div>
+      <span class="attr-label">This project is benchmarked against this real-world deployment</span>
+    </div>
+    <div class="tension-grid">
+      <div class="tension-card fu">
+        <div class="t-label">Challenge 01</div>
+        <h4>Speed vs Compliance</h4>
+        <p>Manual review is slow and error-prone. Simple rules lack the reasoning needed for complex supplier risk scenarios at enterprise scale.</p>
+      </div>
+      <div class="tension-card fu delay-1">
+        <div class="t-label">Challenge 02</div>
+        <h4>Autonomy vs Control</h4>
+        <p>Need to process thousands of decisions fast, but cannot let high-risk decisions slip through without proper policy validation.</p>
+      </div>
+      <div class="tension-card fu delay-2">
+        <div class="t-label">Challenge 03</div>
+        <h4>Scale</h4>
+        <p>Enterprise managing $900M+ procurement across 260+ suppliers in 7 currencies, each with unique risk profiles and contract terms.</p>
+      </div>
+    </div>
+    <div class="callout fu">
+      <div class="callout-ttl">The Opportunity — Inspired by Honeywell × JPMorgan</div>
+      <p>
+        Honeywell partnered with JPMorgan to deploy a <strong>record-breaking $900M+ supply chain finance solution</strong> across 260+ suppliers in 7 currencies, freeing up significant working capital through optimized payment terms. This project builds on that real-world problem: a <strong>multi-agent AI system</strong> where each agent reasons independently, then a governance agent validates ALL decisions against policy before approving them — bringing AI reasoning to the scale and compliance demands of enterprise treasury operations.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SOLUTION ARCHITECTURE ═══ -->
+<section class="cream">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Architecture</div>
+    <h2 class="sec-title fu">The 6-Agent<br/><span class="ac">Pipeline</span></h2>
+    <p class="sec-lead fu">Each agent reasons independently about its domain using the ReAct pattern. No agent knows about the others. The governance agent validates the entire chain before any decision is approved.</p>
+
+    <div class="pipeline-flow fu">
+      <div class="pipe-in-out">📄 Invoice Input</div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-row"><div class="pipe-box"><div class="pipe-left"><div class="pipe-num">1</div><div class="pipe-name">Invoice Analysis</div></div><div class="pipe-out">Status: Valid / Flagged</div></div></div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-row"><div class="pipe-box"><div class="pipe-left"><div class="pipe-num">2</div><div class="pipe-name">Supplier Risk</div></div><div class="pipe-out">Risk Score: 0–100</div></div></div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-row"><div class="pipe-box"><div class="pipe-left"><div class="pipe-num">3</div><div class="pipe-name">Working Capital Optimizer</div></div><div class="pipe-out">Cash Freed: $X</div></div></div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-row"><div class="pipe-box"><div class="pipe-left"><div class="pipe-num">4</div><div class="pipe-name">Financing Recommender</div></div><div class="pipe-out">Payment Method</div></div></div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-row"><div class="pipe-box"><div class="pipe-left"><div class="pipe-num">5</div><div class="pipe-name">Executive Summary</div></div><div class="pipe-out">CFO Insights</div></div></div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-row"><div class="pipe-box gov"><div class="pipe-left"><div class="pipe-num g">6</div><div class="pipe-name g">Governance Agent</div></div><div class="pipe-out g">Policy Validation</div></div></div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-in-out out">✅ APPROVED &nbsp;&nbsp;/&nbsp;&nbsp; 🔺 ESCALATE_TO_CFO</div>
+    </div>
+
+    <div class="agents-grid">
+      <div class="agent-card fu">
+        <div class="agent-hd"><div class="a-num">1</div><div><div class="a-name">Invoice Analysis</div><div class="a-role">Validates invoice integrity</div></div></div>
+        <ul class="a-list">
+          <li>Validates invoice against purchase order</li>
+          <li>Checks supplier enrollment and contract terms</li>
+          <li>Detects anomalies: price variance &gt;10%, qty mismatches, unusual payment terms</li>
+        </ul>
+        <span class="a-output">Output: APPROVED or FLAGGED status</span>
+      </div>
+      <div class="agent-card fu delay-1">
+        <div class="agent-hd"><div class="a-num">2</div><div><div class="a-name">Supplier Risk</div><div class="a-role">Composite risk scoring 0–100</div></div></div>
+        <ul class="a-list">
+          <li>Analyzes payment history (% early/on-time/late, avg days late)</li>
+          <li>Checks delivery performance (on-time rate, defect rate)</li>
+          <li>Assesses financial health (credit score, cash conversion cycle)</li>
+          <li>Calculates composite risk score from 0 (no risk) to 100 (extreme)</li>
+        </ul>
+        <span class="a-output">Output: Risk score + LOW/MEDIUM/HIGH/CRITICAL</span>
+      </div>
+      <div class="agent-card fu delay-2">
+        <div class="agent-hd"><div class="a-num">3</div><div><div class="a-name">Working Capital Optimizer</div><div class="a-role">Cash flow modeling</div></div></div>
+        <ul class="a-list">
+          <li>Calculates cash impact of different payment term scenarios</li>
+          <li>Models supplier cash flow impact if terms change</li>
+          <li>Validates against treasury thresholds (max term extension, policy limits)</li>
+          <li>Recommends optimal payment terms to balance cash freed with supplier relationship</li>
+        </ul>
+        <span class="a-output">Output: WC freed ($) + recommended term adjustment</span>
+      </div>
+      <div class="agent-card fu delay-3">
+        <div class="agent-hd"><div class="a-num">4</div><div><div class="a-name">Financing Recommender</div><div class="a-role">Payment method optimization</div></div></div>
+        <ul class="a-list">
+          <li>Gets current market rates for supply chain financing (SCF discounts, fees)</li>
+          <li>Evaluates NORMAL (standard terms), SCF, and IMMEDIATE (early payment) methods</li>
+          <li>Calculates financial trade-offs for each method</li>
+          <li>Recommends optimal method based on supplier tier and risk profile</li>
+        </ul>
+        <span class="a-output">Output: Recommended payment method + discount/fee applied</span>
+      </div>
+      <div class="agent-card fu delay-4">
+        <div class="agent-hd"><div class="a-num">5</div><div><div class="a-name">Executive Summary</div><div class="a-role">CFO-ready insights</div></div></div>
+        <ul class="a-list">
+          <li>Aggregates batch performance across all invoices processed in period</li>
+          <li>Calculates KPIs: % approved auto, % escalated, WC freed, SCF penetration</li>
+          <li>Identifies trends and outliers across the supplier portfolio</li>
+          <li>Generates CFO-ready insights and recommendations for next period</li>
+        </ul>
+        <span class="a-output">Output: Dashboard metrics + strategic recommendations</span>
+      </div>
+      <div class="agent-card gov-card fu delay-5">
+        <div class="agent-hd"><div class="a-num g">6</div><div><div class="a-name g">Governance Agent</div><div class="a-role">The critical validation layer</div></div></div>
+        <ul class="a-list">
+          <li>Check 1: Confidence validation, are all 5 prior agents &gt;80% confident?</li>
+          <li>Check 2: Policy compliance, does risk level match payment method?</li>
+          <li>Check 3: Contradiction detection between agent outputs</li>
+          <li>Check 4: Required fields all present and valid?</li>
+          <li>Check 5: Escalation triggers, amount &gt;$5M or risk &gt;75?</li>
+          <li>Check 6: Audit trail, generate compliance-ready trace of all checks</li>
+        </ul>
+        <span class="a-output g">Output: APPROVED / REQUIRES_REVIEW / REJECTED / ESCALATE_TO_CFO</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TECH STACK ═══ -->
+<section class="light">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Stack</div>
+    <h2 class="sec-title fu">Technologies<br/><span class="ac">Used</span></h2>
+    <div class="tech-grid">
+      <div class="tech-card fu">
+        <div class="tech-hd"><div class="tech-ico">🤖</div><div class="tech-ttl">AI & LLMs</div></div>
+        <div class="tech-items">
+          <div class="tech-item">Claude 3.5 Sonnet — reasoning engine for all 6 agents</div>
+          <div class="tech-item">LangChain — multi-agent orchestration framework</div>
+          <div class="tech-item">ReAct pattern for autonomous tool use</div>
+          <div class="tech-item">Confidence scoring and reasoning validation</div>
+        </div>
+      </div>
+      <div class="tech-card fu delay-1">
+        <div class="tech-hd"><div class="tech-ico">⚙️</div><div class="tech-ttl">Infrastructure</div></div>
+        <div class="tech-items">
+          <div class="tech-item">Python 3.10+ — core implementation with type hints</div>
+          <div class="tech-item">LangGraph — agentic workflow orchestration</div>
+          <div class="tech-item">Gradio — web dashboard interface</div>
+          <div class="tech-item">Deployable to Hugging Face Spaces (serverless)</div>
+        </div>
+      </div>
+      <div class="tech-card fu delay-2">
+        <div class="tech-hd"><div class="tech-ico">📊</div><div class="tech-ttl">Data & Logic</div></div>
+        <div class="tech-items">
+          <div class="tech-item">Supplier Knowledge Base (payment history, delivery metrics, financial scores)</div>
+          <div class="tech-item">Treasury Policy Engine (risk thresholds, auto-approval limits)</div>
+          <div class="tech-item">Working Capital Calculation Models (cash freed scenarios)</div>
+          <div class="tech-item">Governance Rule Engine (hard policy enforcement)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DEMO RESULTS ═══ -->
+<section class="cream">
+  <div class="sec-inner">
+    <div class="sec-tag fu">System in Action</div>
+    <h2 class="sec-title fu">Processing a<br/><span class="ac">$2.5M Invoice</span></h2>
+    <p class="sec-lead fu">ElectroCore Systems, a strategic-tier supplier, submits a $2.5M invoice. Here is how all six agents reason through it in sequence.</p>
+
+    <!-- Invoice context strip -->
+    <div class="inv-context fu">
+      <div class="inv-field"><div class="inv-label">Supplier</div><div class="inv-val">ElectroCore Systems</div></div>
+      <div class="inv-sep"></div>
+      <div class="inv-field"><div class="inv-label">Invoice Amount</div><div class="inv-val">$2,500,000</div></div>
+      <div class="inv-sep"></div>
+      <div class="inv-field"><div class="inv-label">Supplier Tier</div><div class="inv-val">Strategic</div></div>
+      <div class="inv-sep"></div>
+      <div class="inv-field"><div class="inv-label">Current Terms</div><div class="inv-val">Net 30</div></div>
+      <div class="inv-sep"></div>
+      <div class="inv-field"><div class="inv-label">Currency</div><div class="inv-val">USD</div></div>
+    </div>
+
+    <!-- Agent result cards -->
+    <div class="result-grid">
+
+      <div class="result-card fu">
+        <div class="rc-top">
+          <div class="rc-num">01</div>
+          <div class="rc-status green">Valid</div>
+        </div>
+        <div class="rc-agent">Invoice Analysis</div>
+        <div class="rc-metric">No anomalies</div>
+        <div class="rc-desc">Invoice matches PO, supplier enrolled, no price variance or quantity mismatches detected.</div>
+        <div class="rc-conf">
+          <div class="rc-conf-label">Confidence</div>
+          <div class="rc-conf-track"><div class="rc-conf-fill" style="width:92%"></div></div>
+          <div class="rc-conf-pct">92%</div>
+        </div>
+      </div>
+
+      <div class="result-card fu delay-1">
+        <div class="rc-top">
+          <div class="rc-num">02</div>
+          <div class="rc-status green">Low Risk</div>
+        </div>
+        <div class="rc-agent">Supplier Risk</div>
+        <div class="rc-metric">8.1 <span>/ 100</span></div>
+        <div class="rc-desc">Pays 3 days early on average. 98% on-time delivery. Strong credit score and healthy cash conversion cycle.</div>
+        <div class="rc-conf">
+          <div class="rc-conf-label">Confidence</div>
+          <div class="rc-conf-track"><div class="rc-conf-fill" style="width:88%"></div></div>
+          <div class="rc-conf-pct">88%</div>
+        </div>
+      </div>
+
+      <div class="result-card fu delay-2">
+        <div class="rc-top">
+          <div class="rc-num">03</div>
+          <div class="rc-status green">Optimized</div>
+        </div>
+        <div class="rc-agent">Working Capital</div>
+        <div class="rc-metric">$205,479 <span>freed</span></div>
+        <div class="rc-desc">Extending payment terms from 30 to 60 days frees $205k. Supplier cash flow impact is within acceptable range.</div>
+        <div class="rc-conf">
+          <div class="rc-conf-label">Confidence</div>
+          <div class="rc-conf-track"><div class="rc-conf-fill" style="width:86%"></div></div>
+          <div class="rc-conf-pct">86%</div>
+        </div>
+      </div>
+
+      <div class="result-card fu delay-3">
+        <div class="rc-top">
+          <div class="rc-num">04</div>
+          <div class="rc-status green">Normal</div>
+        </div>
+        <div class="rc-agent">Financing</div>
+        <div class="rc-metric">Standard terms</div>
+        <div class="rc-desc">Low risk profile and stable cash flow make standard payment terms the optimal choice. SCF not required.</div>
+        <div class="rc-conf">
+          <div class="rc-conf-label">Confidence</div>
+          <div class="rc-conf-track"><div class="rc-conf-fill" style="width:85%"></div></div>
+          <div class="rc-conf-pct">85%</div>
+        </div>
+      </div>
+
+      <div class="result-card fu delay-4">
+        <div class="rc-top">
+          <div class="rc-num">05</div>
+          <div class="rc-status green">On Track</div>
+        </div>
+        <div class="rc-agent">Executive Summary</div>
+        <div class="rc-metric">85% <span>auto-approved</span></div>
+        <div class="rc-desc">Monthly batch: $2.1M working capital freed across all invoices. SCF penetration and KPIs within targets.</div>
+        <div class="rc-conf">
+          <div class="rc-conf-label">Confidence</div>
+          <div class="rc-conf-track"><div class="rc-conf-fill" style="width:87%"></div></div>
+          <div class="rc-conf-pct">87%</div>
+        </div>
+      </div>
+
+      <div class="result-card gov-result fu delay-5">
+        <div class="rc-top">
+          <div class="rc-num gov-n">06</div>
+          <div class="rc-status gold">Approved</div>
+        </div>
+        <div class="rc-agent" style="color:var(--gold);">Governance Agent</div>
+        <div class="rc-metric gov-m">6 / 6 <span>checks passed</span></div>
+        <div class="rc-checks">
+          <div class="rcc">All agents above 80% confidence threshold</div>
+          <div class="rcc">Risk 8 with normal terms, policy compliant</div>
+          <div class="rcc">No contradictions between agent outputs</div>
+          <div class="rcc">$2.5M is below the $5M escalation threshold</div>
+        </div>
+        <div class="rc-conf">
+          <div class="rc-conf-label">Governance Confidence</div>
+          <div class="rc-conf-track"><div class="rc-conf-fill gold-fill" style="width:95%"></div></div>
+          <div class="rc-conf-pct" style="color:var(--gold);">95%</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Verdict -->
+    <div class="verdict-strip fu">
+      <div class="vs-left">
+        <div class="vs-label">Final Decision</div>
+        <div class="vs-decision">Approved</div>
+      </div>
+      <div class="vs-divider"></div>
+      <div class="vs-stat">
+        <div class="vs-num">$205,479</div>
+        <div class="vs-desc">Working capital freed</div>
+      </div>
+      <div class="vs-divider"></div>
+      <div class="vs-stat">
+        <div class="vs-num">60 days</div>
+        <div class="vs-desc">Optimal payment terms</div>
+      </div>
+      <div class="vs-divider"></div>
+      <div class="vs-stat">
+        <div class="vs-num">6 / 6</div>
+        <div class="vs-desc">Governance checks passed</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ BUSINESS IMPACT ═══ -->
+<section class="cream">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Business Value</div>
+    <h2 class="sec-title fu">Real Business<br/><span class="ac">Impact</span></h2>
+    <div class="impact-grid">
+      <div class="impact-card fu">
+        <div class="impact-hd"><div class="impact-ico">💰</div><div class="impact-ttl">Working Capital Optimization</div></div>
+        <ul class="impact-list">
+          <li>Freed $205k on this single $2.5M invoice</li>
+          <li>Extrapolated across thousands of invoices, the result is millions in freed working capital</li>
+          <li>Direct, measurable impact on company cash flow and financial flexibility</li>
+        </ul>
+      </div>
+      <div class="impact-card fu delay-1">
+        <div class="impact-hd"><div class="impact-ico">🛡️</div><div class="impact-ttl">Risk Management</div></div>
+        <ul class="impact-list">
+          <li>Governance agent catches policy violations automatically, not after the fact</li>
+          <li>Prevents high-risk suppliers from being approved with normal terms</li>
+          <li>Flags low-confidence decisions before they become financial exposure</li>
+          <li>No surprises, no compliance violations</li>
+        </ul>
+      </div>
+      <div class="impact-card fu delay-2">
+        <div class="impact-hd"><div class="impact-ico">⚡</div><div class="impact-ttl">Operational Efficiency</div></div>
+        <ul class="impact-list">
+          <li>Qualifying invoices process in seconds without human touch</li>
+          <li>High-risk decisions automatically escalate, no manual triage needed</li>
+          <li>Treasury team focuses on exceptions, not routine decisions</li>
+          <li>Scales from hundreds to thousands of invoices without adding headcount</li>
+        </ul>
+      </div>
+      <div class="impact-card fu delay-3">
+        <div class="impact-hd"><div class="impact-ico">📋</div><div class="impact-ttl">Compliance & Audit</div></div>
+        <ul class="impact-list">
+          <li>Every decision has a complete, structured reasoning trail</li>
+          <li>Policy enforcement is deterministic, hard rules not subjective judgment</li>
+          <li>Audit teams have documentation ready for regulatory reviews on demand</li>
+          <li>Escalation decisions are automatic, traceable, and defensible</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GOVERNANCE LAYER ═══ -->
+<section class="dark">
+  <div class="sec-inner">
+    <div class="sec-tag fu">The Differentiator</div>
+    <h2 class="sec-title fu">How the Governance<br/><span class="ac-gold">Layer Works</span></h2>
+    <p class="sec-lead fu">
+      The Governance Agent is what separates this from a typical multi-agent system. Most systems stop after the last agent outputs a recommendation. This system adds a validation step that catches everything that could go wrong before any decision is approved or executed.
+    </p>
+    <div class="gov-grid">
+      <div class="gc fu"><div class="gc-n">1</div><div><div class="gc-ttl">Confidence Check</div><div class="gc-desc">Are all upstream agents &gt;80% confident in their outputs? Low confidence flags for human review before proceeding.</div></div></div>
+      <div class="gc fu delay-1"><div class="gc-n">2</div><div><div class="gc-ttl">Policy Check</div><div class="gc-desc">Does the risk score align with the recommended payment method? A high-risk supplier with normal terms gets rejected.</div></div></div>
+      <div class="gc fu delay-2"><div class="gc-n">3</div><div><div class="gc-ttl">Contradiction Check</div><div class="gc-desc">Are there logical conflicts between agent recommendations? Contradictions are flagged rather than silently passed through.</div></div></div>
+      <div class="gc fu delay-3"><div class="gc-n">4</div><div><div class="gc-ttl">Completeness Check</div><div class="gc-desc">Are all required fields present and valid? Missing data in the decision chain triggers a required review.</div></div></div>
+      <div class="gc fu delay-4"><div class="gc-n">5</div><div><div class="gc-ttl">Escalation Check</div><div class="gc-desc">Does this decision trigger CFO review? Amount &gt;$5M or risk score &gt;75 auto-escalates regardless of other checks.</div></div></div>
+      <div class="gc fu delay-5"><div class="gc-n">6</div><div><div class="gc-ttl">Audit Check</div><div class="gc-desc">Generate a compliance-ready trace of the entire decision with all reasoning and checks documented.</div></div></div>
+    </div>
+    <div class="gov-rules fu">
+      <div class="gr"><span class="c">IF amount &gt; $5M</span><span class="r">→ ESCALATE_TO_CFO</span></div>
+      <div class="gr"><span class="c">IF payment_method = "immediate"</span><span class="r">→ ESCALATE_TO_CFO</span></div>
+      <div class="gr"><span class="c">IF risk &gt; 75 AND method = "normal"</span><span class="r">→ REJECTED</span></div>
+      <div class="gr"><span class="c">IF any agent confidence &lt; 80%</span><span class="r">→ REQUIRES_REVIEW</span></div>
+      <div class="gr"><span class="c">IF any policy check failed</span><span class="r">→ REQUIRES_REVIEW</span></div>
+      <div class="gr else"><span class="c">ELSE</span><span class="r">→ APPROVED</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section id="cta">
+  <div class="cta-inner">
+    <h2 class="cta-ttl fu">Explore the Code</h2>
+    <p class="cta-sub fu">Full implementation with 6 agent modules, comprehensive test suite, and production-ready architecture. Deployable to Hugging Face Spaces.</p>
+    <div class="cta-btns fu">
+      <button class="btn-hero-gh" onclick="showComingSoon('github')">⌥ View on GitHub</button>
+      <button class="btn-hero-demo" onclick="showComingSoon('demo')">▶ Live Demo</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="index.html">← Back to Portfolio</a> &nbsp;·&nbsp;
+    Muthuvisali Ravichandra Bose &nbsp;·&nbsp; Product Manager &amp; AI Builder
+  </p>
+</footer>
+
+<!-- COMING SOON MODAL -->
+<div class="modal-overlay" id="csModal" onclick="if(event.target===this)hideModal()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="hideModal()">×</button>
+    <span class="modal-icon" id="mIcon">🚀</span>
+    <div class="modal-ttl" id="mTitle">Coming Soon</div>
+    <div class="modal-sub" id="mSub">This will be available shortly.</div>
+    <div class="modal-badge"><div class="m-dot"></div><span id="mBadge">In Development</span></div>
+  </div>
+</div>
+
+<script>
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    document.getElementById('scrollBar').style.width = pct + '%';
+  });
+
+  // Scroll-in animation
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fu').forEach(el => obs.observe(el));
+
+  // Coming soon modal
+  const content = {
+    github: {
+      icon: '🛠️',
+      title: 'Repo Dropping Soon',
+      sub: 'The full codebase with all 6 agent modules, comprehensive test suite, and deployment config is being prepared for release. Check back shortly.',
+      badge: 'Code in Review'
+    },
+    demo: {
+      icon: '⚡',
+      title: 'Demo Launching Soon',
+      sub: 'The live Gradio dashboard is being deployed to Hugging Face Spaces. You will be able to run real invoices through the full 6-agent pipeline.',
+      badge: 'Deploying to HF Spaces'
+    }
+  };
+
+  function showComingSoon(type) {
+    const d = content[type];
+    document.getElementById('mIcon').textContent = d.icon;
+    document.getElementById('mTitle').textContent = d.title;
+    document.getElementById('mSub').textContent = d.sub;
+    document.getElementById('mBadge').textContent = d.badge;
+    document.getElementById('csModal').classList.add('open');
+  }
+
+  function hideModal() {
+    document.getElementById('csModal').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideModal(); });
+</script>
+</body>
+</html>
