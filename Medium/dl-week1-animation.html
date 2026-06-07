@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a Neural Network Learns — Forward Pass & Backpropagation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f1117;
+    color: #e8e8e8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 22px; font-weight: 600; text-align: center; margin-bottom: 6px; color: #f0f0f0; }
+  .subtitle { font-size: 13px; color: #888; text-align: center; margin-bottom: 28px; }
+
+  .card {
+    background: #1a1d27;
+    border: 1px solid #2a2d3e;
+    border-radius: 14px;
+    padding: 24px 28px;
+    width: 100%;
+    max-width: 760px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 16px;
+  }
+
+  /* ── PHASE BADGE ── */
+  #phaseBadge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    transition: background .3s, color .3s;
+  }
+  .badge-idle    { background:#252835; color:#888; }
+  .badge-fwd     { background:#0d3d2a; color:#4ade80; border: 1px solid #1D9E75; }
+  .badge-loss    { background:#3d1d08; color:#fb923c; border: 1px solid #C07030; }
+  .badge-back    { background:#3d0d0d; color:#f87171; border: 1px solid #D85A30; }
+  .badge-update  { background:#1d1450; color:#a78bfa; border: 1px solid #534AB7; }
+  .badge-done    { background:#0d3040; color:#38bdf8; border: 1px solid #0ea5e9; }
+
+  canvas#nn {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  /* ── STEP EXPLANATION ── */
+  #stepExplain {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #ccc;
+    min-height: 44px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #12141e;
+    border-radius: 8px;
+    border-left: 3px solid #333;
+    transition: border-color .3s;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  button {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 1px solid #2a2d3e;
+    background: #252835;
+    color: #ccc;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  button:hover { background: #2e3245; color: #fff; }
+  button.active-fwd   { background: #0d3d2a; color: #4ade80; border-color: #1D9E75; }
+  button.active-back  { background: #3d0d0d; color: #f87171; border-color: #D85A30; }
+  button.active-auto  { background: #1d1450; color: #a78bfa; border-color: #534AB7; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; }
+  .leg { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #888; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── STATS ── */
+  .stats { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .stat {
+    flex: 1; min-width: 90px;
+    background: #12141e;
+    border: 1px solid #2a2d3e;
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #555; margin-bottom: 4px; }
+  .stat-val { font-size: 20px; font-weight: 600; color: #e8e8e8; font-variant-numeric: tabular-nums; }
+  .stat-val.good { color: #4ade80; }
+  .stat-val.warn { color: #fb923c; }
+  .stat-val.bad  { color: #f87171; }
+
+  /* ── LOSS CHART ── */
+  canvas#loss { display: block; width: 100%; border-radius: 8px; margin-top: 4px; }
+
+  .overfit-banner {
+    display: none;
+    background: #2d1010;
+    border: 1px solid #7f1d1d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #fca5a5;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  /* ── SPEED ── */
+  .speed-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+  .speed-row label { font-size: 12px; color: #666; }
+  input[type=range] { flex: 1; accent-color: #534AB7; }
+  #speedOut { font-size: 12px; color: #888; min-width: 40px; }
+</style>
+</head>
+<body>
+
+<h1>How a Neural Network Learns</h1>
+<p class="subtitle">Forward pass · Loss function · Backpropagation · Overfitting — explained visually</p>
+
+<div class="card">
+  <div class="card-title">Neural network animation</div>
+  <div id="phaseBadge" class="badge-idle">Press a button to start</div>
+  <canvas id="nn" height="280"></canvas>
+  <div id="stepExplain">Choose a mode below. The animation will walk you through each stage of how a neural network learns.</div>
+
+  <div class="btn-row">
+    <button id="btnFwd"  onclick="setMode('fwd')">▶ Forward pass</button>
+    <button id="btnBack" onclick="setMode('back')">◀ Backpropagation</button>
+    <button id="btnAuto" onclick="setMode('auto')">⟳ Full training loop</button>
+    <button id="btnReset" onclick="doReset()">↺ Reset</button>
+  </div>
+
+  <div class="speed-row">
+    <label>Speed</label>
+    <input type="range" id="speedSlider" min="0.3" max="3" step="0.1" value="1">
+    <span id="speedOut">1×</span>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="dot" style="background:#4ade80"></div>Forward pass signal</div>
+    <div class="leg"><div class="dot" style="background:#f87171"></div>Error (backprop)</div>
+    <div class="leg"><div class="dot" style="background:#a78bfa"></div>Weight being updated</div>
+    <div class="leg"><div class="dot" style="background:#fb923c"></div>Loss computed</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Training loss vs validation loss — run full loop to see overfitting</div>
+  <canvas id="loss" height="130"></canvas>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Epoch</div><div class="stat-val" id="svEpoch">0/60</div></div>
+    <div class="stat"><div class="stat-label">Train loss</div><div class="stat-val" id="svTrain">—</div></div>
+    <div class="stat"><div class="stat-label">Val loss</div><div class="stat-val" id="svVal">—</div></div>
+    <div class="stat"><div class="stat-label">Status</div><div class="stat-val" id="svStatus">—</div></div>
+  </div>
+  <div class="overfit-banner" id="ovBanner">
+    ⚠ Overfitting detected. Training loss keeps falling but validation loss is rising. The model is memorising the training data, not learning patterns. In production this looks like 99% test accuracy and 70% real-world accuracy.
+  </div>
+</div>
+
+<script>
+// ── CANVAS SETUP ──
+const nnC = document.getElementById('nn');
+const lC  = document.getElementById('loss');
+const DPR = window.devicePixelRatio || 1;
+
+function resize(c, cssH) {
+  const cssW = c.parentElement.clientWidth - 56;
+  c.width  = cssW * DPR;
+  c.height = cssH * DPR;
+  c.style.width  = cssW + 'px';
+  c.style.height = cssH + 'px';
+  const ctx = c.getContext('2d');
+  ctx.scale(DPR, DPR);
+  return { ctx, W: cssW, H: cssH };
+}
+
+let nn, lv;
+function initCanvases() {
+  nn = resize(nnC, 280);
+  lv = resize(lC, 130);
+}
+initCanvases();
+
+// ── NETWORK LAYOUT ──
+const LAYERS   = [3, 5, 5, 2];
+const LAYER_LABELS = ['Input layer', 'Hidden layer 1', 'Hidden layer 2', 'Output layer'];
+const LAYER_NOTES  = ['(your data)', '(pattern detection)', '(deeper patterns)', '(prediction)'];
+
+function lx(l) {
+  const pad = 80;
+  return pad + (l / (LAYERS.length - 1)) * (nn.W - pad * 2);
+}
+function ny(l, n) {
+  const gap = Math.min(44, (nn.H - 80) / LAYERS[l]);
+  const top = nn.H / 2 - ((LAYERS[l] - 1) * gap) / 2;
+  return top + n * gap;
+}
+
+// ── WEIGHTS ──
+let W = [];
+function initW() {
+  W = LAYERS.slice(0, -1).map((s, l) =>
+    Array.from({ length: s }, () =>
+      Array.from({ length: LAYERS[l + 1] }, () => (Math.random() - .5) * 2)
+    )
+  );
+}
+initW();
+
+// ── STATE ──
+let mode = 'idle';
+let fwdP = 0, backP = 0;
+let autoPhase = 'fwd', autoPauseStart = 0;
+let epoch = 0; const MAX_EP = 60;
+let trainH = [], valH = [];
+let flashWts = [];
+let speed = 1;
+let running = false;
+let raf = null, prevTs = 0;
+
+const FWD_DUR  = 1600;
+const BACK_DUR = 1600;
+const PAUSE_MS = 500;
+
+// ── EXPLANATIONS ──
+const EXPLAIN = {
+  idle:   'Choose a mode below. The animation will walk you through each stage of how a neural network learns.',
+  fwd_early:  '➡ FORWARD PASS: The input signal (green) enters the first layer and travels left to right. Each node multiplies its inputs by its weights and passes the result forward. This is the network making a guess.',
+  fwd_mid:    '➡ FORWARD PASS: The signal moves through the hidden layers. Each layer extracts slightly more abstract patterns from the data. Think of each node as asking: "does my piece of the pattern match?"',
+  fwd_done:   '✓ FORWARD PASS COMPLETE: The network has produced a prediction (output layer). Now we need to measure how wrong that prediction was. That is the loss function\'s job.',
+  loss:       '⚡ LOSS COMPUTED (orange): The loss function compares the prediction to the correct answer and returns a single number — the error. Large number = bad prediction. Zero = perfect prediction. This number now travels backwards.',
+  back_early: '◀ BACKPROPAGATION: The error (red) travels right to left through the network. Each layer it passes, it asks every weight a question: "if I adjust you slightly, does the total error go up or down?"',
+  back_mid:   '◀ BACKPROPAGATION: Weights are being updated (purple flashes). Each purple flash is one weight being nudged in the direction that reduces the loss. Millions of these nudges happen every single epoch.',
+  back_done:  '✓ EPOCH COMPLETE: Every weight has been updated slightly. The network is now marginally better at its task. This entire cycle — forward pass → loss → backprop → update — repeats for every epoch.',
+  overfit:    '⚠ OVERFITTING: Training loss (purple) keeps falling but validation loss (red) is now rising. The model is memorising training data instead of learning general patterns. It would fail on real users.',
+};
+
+function setExplain(key) {
+  const el = document.getElementById('stepExplain');
+  el.textContent = EXPLAIN[key] || '';
+  const colors = { fwd_early:'#1D9E75', fwd_mid:'#1D9E75', fwd_done:'#1D9E75', loss:'#fb923c', back_early:'#D85A30', back_mid:'#D85A30', back_done:'#a78bfa', overfit:'#f87171', idle:'#333' };
+  el.style.borderLeftColor = colors[key] || '#333';
+}
+
+function setBadge(text, cls) {
+  const b = document.getElementById('phaseBadge');
+  b.textContent = text;
+  b.className = cls;
+}
+
+// ── MODE CONTROL ──
+function setMode(m) {
+  mode = m; running = true;
+  fwdP = 0; backP = 0; flashWts = [];
+  document.querySelectorAll('button').forEach(b => b.classList.remove('active-fwd','active-back','active-auto'));
+  if (m === 'fwd')  { document.getElementById('btnFwd').classList.add('active-fwd');  autoPhase='fwd'; setBadge('Forward pass — signal travels left → right','badge-fwd'); setExplain('fwd_early'); }
+  if (m === 'back') { document.getElementById('btnBack').classList.add('active-back'); autoPhase='back'; setBadge('Backpropagation — error travels right → left','badge-back'); setExplain('back_early'); }
+  if (m === 'auto') { document.getElementById('btnAuto').classList.add('active-auto'); autoPhase='fwd'; setBadge('Full training loop running...','badge-update'); setExplain('fwd_early'); }
+}
+
+function doReset() {
+  mode='idle'; running=false; epoch=0; fwdP=0; backP=0;
+  trainH=[]; valH=[]; flashWts=[]; autoPhase='fwd';
+  initW();
+  document.querySelectorAll('button').forEach(b=>b.classList.remove('active-fwd','active-back','active-auto'));
+  document.getElementById('svEpoch').textContent='0/60';
+  ['svTrain','svVal','svStatus'].forEach(id=>{ const el=document.getElementById(id); el.textContent='—'; el.className='stat-val'; });
+  document.getElementById('ovBanner').style.display='none';
+  setBadge('Press a button to start','badge-idle');
+  setExplain('idle');
+  drawNN(0); drawLoss();
+}
+
+// ── TRAIN STEP ──
+function trainStep() {
+  epoch++;
+  const t = epoch / MAX_EP;
+  const tl = Math.max(0.04, 0.84 * Math.exp(-3.6*t) + 0.04 + (Math.random()-.5)*.018);
+  const vl = epoch <= 36
+    ? Math.max(0.09, 0.88 * Math.exp(-2.7*t) + 0.09 + (Math.random()-.5)*.022)
+    : Math.max(0.09, 0.19 + ((epoch-36)/(MAX_EP-36))*0.28 + (Math.random()-.5)*.02);
+  trainH.push(tl); valH.push(vl);
+  for (let l=0;l<W.length;l++)
+    for (let i=0;i<W[l].length;i++)
+      for (let j=0;j<W[l][i].length;j++)
+        W[l][i][j] = Math.max(-1,Math.min(1,W[l][i][j]+(Math.random()-.5)*.05*(1-t)));
+  const overfit = epoch>38 && vl>tl+0.09;
+  document.getElementById('svEpoch').textContent = epoch+'/60';
+  const te=document.getElementById('svTrain'); te.textContent=tl.toFixed(3); te.className='stat-val '+(tl<.15?'good':tl<.35?'warn':'bad');
+  const ve=document.getElementById('svVal');   ve.textContent=vl.toFixed(3); ve.className='stat-val '+(overfit?'bad':vl<.20?'good':'warn');
+  const se=document.getElementById('svStatus');
+  if (overfit) { se.textContent='Overfitting'; se.className='stat-val bad'; document.getElementById('ovBanner').style.display='block'; setExplain('overfit'); }
+  else if (vl<.22) { se.textContent='Learning'; se.className='stat-val good'; }
+  else { se.textContent='Training'; se.className='stat-val warn'; }
+  if (epoch>=MAX_EP) { running=false; setBadge('Training complete — 60 epochs done','badge-done'); }
+}
+
+// ── DRAW NETWORK ──
+function drawNN(ts) {
+  const { ctx, W: W_, H: H_ } = nn;
+  ctx.clearRect(0, 0, W_, H_);
+
+  const numL = LAYERS.length;
+
+  // ── CONNECTIONS ──
+  for (let l=0;l<numL-1;l++) {
+    for (let i=0;i<LAYERS[l];i++) {
+      for (let j=0;j<LAYERS[l+1];j++) {
+        const ax=lx(l), ay=ny(l,i), bx=lx(l+1), by=ny(l+1,j);
+        const w=W[l]?W[l][i][j]:0;
+
+        // Default styling
+        let stroke = `rgba(255,255,255,${Math.abs(w)*0.12+0.04})`;
+        let lw = 0.5;
+
+        // Forward pass glow
+        const fwdLayerStart = l/(numL-2);
+        const fwdLayerEnd   = (l+1)/(numL-2);
+        const inFwd = (mode==='fwd'||((mode==='auto')&&autoPhase==='fwd'));
+        if (inFwd) {
+          const p = fwdP;
+          if (p >= fwdLayerStart-0.05 && p <= fwdLayerEnd+0.08) {
+            const lp = Math.max(0,Math.min(1,(p-fwdLayerStart)/(fwdLayerEnd-fwdLayerStart)));
+            stroke = `rgba(74,222,128,${0.2+lp*0.75})`;
+            lw = 0.6 + lp*2.5;
+          }
+        }
+
+        // Backprop glow
+        const backLayerStart = (numL-2-l-1)/(numL-2);
+        const backLayerEnd   = (numL-2-l)/(numL-2);
+        const inBack = (mode==='back'||((mode==='auto')&&autoPhase==='back'));
+        if (inBack) {
+          const p = backP;
+          if (p >= backLayerStart-0.05 && p <= backLayerEnd+0.08) {
+            const lp = Math.max(0,Math.min(1,(p-backLayerStart)/(backLayerEnd-backLayerStart)));
+            stroke = `rgba(248,113,113,${0.2+lp*0.75})`;
+            lw = 0.6+lp*2.5;
+          }
+        }
+
+        // Weight flash (purple)
+        const fl = flashWts.find(f=>f.l===l&&f.i===i&&f.j===j);
+        if (fl) { stroke='rgba(167,139,250,0.9)'; lw=2.5; }
+
+        ctx.strokeStyle=stroke; ctx.lineWidth=lw;
+        ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+      }
+    }
+  }
+
+  // ── NODES ──
+  for (let l=0;l<numL;l++) {
+    for (let n=0;n<LAYERS[l];n++) {
+      const x=lx(l), y=ny(l,n);
+      let fill='rgba(255,255,255,0.05)', stroke='rgba(255,255,255,0.18)', r=10;
+
+      // Forward highlight
+      const inFwd2 = (mode==='fwd'||((mode==='auto')&&autoPhase==='fwd'));
+      if (inFwd2) {
+        const nFrac = l/(numL-1);
+        if (Math.abs(fwdP - nFrac) < 0.18) { fill='rgba(74,222,128,0.28)'; stroke='rgba(74,222,128,1)'; r=12; }
+      }
+      // Back highlight
+      const inBack2 = (mode==='back'||((mode==='auto')&&autoPhase==='back'));
+      if (inBack2) {
+        const nFrac = (numL-1-l)/(numL-1);
+        if (Math.abs(backP - nFrac) < 0.18) { fill='rgba(248,113,113,0.28)'; stroke='rgba(248,113,113,1)'; r=12; }
+      }
+
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle=fill; ctx.fill();
+      ctx.strokeStyle=stroke; ctx.lineWidth=1.4; ctx.stroke();
+    }
+
+    // Layer labels
+    ctx.fillStyle='rgba(255,255,255,0.3)';
+    ctx.font='10px Arial'; ctx.textAlign='center';
+    ctx.fillText(LAYER_LABELS[l], lx(l), H_-22);
+    ctx.fillStyle='rgba(255,255,255,0.18)';
+    ctx.font='9px Arial';
+    ctx.fillText(LAYER_NOTES[l], lx(l), H_-10);
+  }
+
+  // ── LOSS BADGE (shown during auto after fwd done) ──
+  const showLoss = (mode==='auto' && autoPhase==='loss') || (mode==='back' && backP<0.05);
+  if (showLoss || (mode==='auto' && autoPhase==='back' && backP<0.1)) {
+    const ox = lx(numL-1)+16;
+    const oy = ny(numL-1, Math.floor(LAYERS[numL-1]/2));
+    ctx.fillStyle='rgba(251,146,60,0.15)';
+    ctx.beginPath();
+    roundRect(ctx, ox, oy-20, 64, 36, 6);
+    ctx.fill();
+    ctx.strokeStyle='rgba(251,146,60,0.6)'; ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillStyle='rgba(251,146,60,0.9)';
+    ctx.font='bold 11px Arial'; ctx.textAlign='center';
+    ctx.fillText('LOSS', ox+32, oy-4);
+    ctx.font='10px Arial'; ctx.fillStyle='rgba(251,146,60,0.65)';
+    ctx.fillText('error ↑', ox+32, oy+10);
+  }
+
+  // ── PREDICT BADGE (shown after fwd done) ──
+  if ((mode==='fwd' && fwdP > 0.88) || (mode==='auto' && autoPhase==='fwd' && fwdP>0.88)) {
+    const ox = lx(numL-1)+16;
+    const oy = ny(numL-1, 0)-16;
+    ctx.fillStyle='rgba(74,222,128,0.12)';
+    ctx.beginPath();
+    roundRect(ctx, ox, oy, 72, 32, 6);
+    ctx.fill();
+    ctx.strokeStyle='rgba(74,222,128,0.5)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(74,222,128,0.9)';
+    ctx.font='bold 11px Arial'; ctx.textAlign='center';
+    ctx.fillText('PREDICT ✓', ox+36, oy+14);
+    ctx.font='10px Arial'; ctx.fillStyle='rgba(74,222,128,0.55)';
+    ctx.fillText('output ready', ox+36, oy+26);
+  }
+
+  // ── BACKPROP ARROW (dashed, right to left) ──
+  const doingBack = (mode==='back' && backP>0.02) || (mode==='auto' && autoPhase==='back' && backP>0.02);
+  if (doingBack) {
+    const startX = lx(numL-1)+4;
+    const endX   = lx(0)-4;
+    const curX   = startX - (startX-endX)*backP;
+    const arrowY = H_/2 + 22;
+    ctx.strokeStyle='rgba(248,113,113,0.6)'; ctx.lineWidth=1.5;
+    ctx.setLineDash([5,5]);
+    ctx.beginPath(); ctx.moveTo(startX, arrowY); ctx.lineTo(curX, arrowY); ctx.stroke();
+    ctx.setLineDash([]);
+    if (backP>0.06) {
+      ctx.beginPath(); ctx.moveTo(curX, arrowY-8); ctx.lineTo(curX-10, arrowY); ctx.lineTo(curX, arrowY+8);
+      ctx.strokeStyle='rgba(248,113,113,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+    ctx.fillStyle='rgba(248,113,113,0.5)'; ctx.font='10px Arial'; ctx.textAlign='center';
+    ctx.fillText('error flowing back →', (startX+curX)/2, arrowY-10);
+  }
+
+  ctx.textAlign='start';
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+// ── DRAW LOSS CHART ──
+function drawLoss() {
+  const { ctx, W: CW, H: CH } = lv;
+  ctx.clearRect(0,0,CW,CH);
+  const pad={t:14,b:28,l:14,r:14};
+  const pw=CW-pad.l-pad.r, ph=CH-pad.t-pad.b;
+  const allV=[...trainH,...valH];
+  if (allV.length<2) {
+    ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.font='13px Arial'; ctx.textAlign='center';
+    ctx.fillText('Run the full training loop to see the loss curves appear', CW/2, CH/2);
+    return;
+  }
+  const maxV=Math.max(...allV)*1.12;
+  const tx=i=>pad.l+(i/(MAX_EP-1))*pw;
+  const ty=v=>pad.t+ph-(v/maxV)*ph;
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=0.5;
+  [.25,.5,.75].forEach(f=>{ ctx.beginPath(); ctx.moveTo(pad.l,pad.t+ph*(1-f)); ctx.lineTo(pad.l+pw,pad.t+ph*(1-f)); ctx.stroke(); });
+
+  // Lines
+  function drawLine(data, color) {
+    if (data.length<2) return;
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round';
+    data.forEach((v,i)=>i===0?ctx.moveTo(tx(i),ty(v)):ctx.lineTo(tx(i),ty(v)));
+    ctx.stroke();
+  }
+  drawLine(trainH,'rgba(167,139,250,0.85)');
+  drawLine(valH,'rgba(248,113,113,0.85)');
+
+  // Overfit marker
+  if (epoch>=38) {
+    const ox=tx(36);
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(ox,pad.t); ctx.lineTo(ox,pad.t+ph); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(248,113,113,0.6)'; ctx.font='10px Arial';
+    ctx.fillText('overfit zone', ox+4, pad.t+11);
+  }
+
+  // Labels
+  ctx.font='11px Arial';
+  ctx.fillStyle='rgba(167,139,250,0.85)'; ctx.fillText('train loss', pad.l+4, pad.t+12);
+  ctx.fillStyle='rgba(248,113,113,0.85)'; ctx.fillText('val loss', pad.l+74, pad.t+12);
+
+  // Epoch axis
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.textAlign='center';
+  [0,20,40,60].forEach(e=>{
+    if(e<=epoch) ctx.fillText('ep'+e, tx(Math.min(e,MAX_EP-1)), pad.t+ph+14);
+  });
+  ctx.textAlign='start';
+}
+
+// ── MAIN LOOP ──
+function loop(ts) {
+  const dt = Math.min(ts - prevTs, 50) * speed;
+  prevTs = ts;
+  if (!prevTs) { prevTs = ts; raf=requestAnimationFrame(loop); return; }
+
+  if (mode==='fwd' && running) {
+    fwdP = Math.min(1, fwdP + dt/FWD_DUR);
+    if (fwdP<0.4) setExplain('fwd_early');
+    else if (fwdP<0.85) setExplain('fwd_mid');
+    else setExplain('fwd_done');
+    if (fwdP>=1) { running=false; setBadge('Forward pass complete','badge-fwd'); }
+  }
+
+  if (mode==='back' && running) {
+    backP = Math.min(1, backP + dt/BACK_DUR);
+    if (backP < 0.35) setExplain('back_early');
+    else setExplain('back_mid');
+    if (backP>0.15 && backP<0.9 && Math.random()<0.04) {
+      const l=Math.floor(Math.random()*W.length);
+      const i=Math.floor(Math.random()*W[l].length);
+      const j=Math.floor(Math.random()*W[l][i].length);
+      flashWts.push({l,i,j,born:ts});
+    }
+    flashWts = flashWts.filter(f=>ts-f.born<200);
+    if (backP>=1) { running=false; flashWts=[]; setExplain('back_done'); setBadge('Backprop complete','badge-update'); }
+  }
+
+  if (mode==='auto' && epoch<MAX_EP) {
+    if (autoPhase==='fwd') {
+      fwdP=Math.min(1,fwdP+dt/FWD_DUR);
+      if (fwdP<0.4) setExplain('fwd_early');
+      else if (fwdP<0.85) setExplain('fwd_mid');
+      else setExplain('fwd_done');
+      setBadge(`Epoch ${epoch+1}/60 · Forward pass →`, 'badge-fwd');
+      if (fwdP>=1) { autoPhase='back'; backP=0; setBadge(`Epoch ${epoch+1}/60 · Computing loss…`, 'badge-loss'); setExplain('loss'); }
+    } else if (autoPhase==='back') {
+      backP=Math.min(1,backP+dt/BACK_DUR);
+      if (backP<0.35) setExplain('back_early');
+      else setExplain('back_mid');
+      setBadge(`Epoch ${epoch+1}/60 · Backpropagation ←`, 'badge-back');
+      if (backP>0.15 && backP<0.9 && Math.random()<0.04) {
+        const l=Math.floor(Math.random()*W.length);
+        const i=Math.floor(Math.random()*W[l].length);
+        const j=Math.floor(Math.random()*W[l][i].length);
+        flashWts.push({l,i,j,born:ts});
+      }
+      flashWts=flashWts.filter(f=>ts-f.born<200);
+      if (backP>=1) { autoPhase='pause'; autoPauseStart=ts; trainStep(); flashWts=[]; setExplain('back_done'); setBadge(`Epoch ${epoch}/60 · Weights updated ✓`, 'badge-update'); }
+    } else if (autoPhase==='pause') {
+      if (ts-autoPauseStart > PAUSE_MS/speed) { autoPhase='fwd'; fwdP=0; backP=0; }
+    }
+  }
+
+  drawNN(ts); drawLoss();
+  raf = requestAnimationFrame(loop);
+}
+
+// ── SPEED SLIDER ──
+document.getElementById('speedSlider').addEventListener('input', function() {
+  speed = parseFloat(this.value);
+  document.getElementById('speedOut').textContent = speed.toFixed(1) + '×';
+});
+
+// ── START ──
+drawNN(0); drawLoss();
+raf = requestAnimationFrame(loop);
+</script>
+</body>
+</html>
