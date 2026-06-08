@@ -708,6 +708,89 @@
 </footer>
 
 <!-- ═══════════════════════════════════
+     JOURNEY / "MY STORY" TIMELINE
+═══════════════════════════════════ -->
+<button class="intro-fab" id="introFab" onclick="openIntro()" aria-label="View my career journey">
+  <span class="intro-fab-ico">🧭</span>
+  <span class="intro-fab-txt">My Journey</span>
+</button>
+
+<div class="intro-overlay" id="introOverlay" onclick="handleIntroOverlayClick(event)">
+  <div class="intro-card" id="introCard">
+    <button class="intro-close" onclick="closeIntro()" aria-label="Close">✕</button>
+
+    <div class="intro-head">
+      <div class="intro-tag">The Journey So Far</div>
+      <h2 class="intro-title">About — <span>Muthuvisali Ravichandra Bose</span></h2>
+      <p class="intro-sub">Graduate Student @ Eller TLP'27</p>
+    </div>
+
+    <div class="intro-track-wrap">
+      <div class="intro-track">
+
+        <div class="intro-stop top">
+          <div class="intro-label">
+            <span class="intro-org">🎓 SNS College of Technology</span>
+            <span class="intro-role">Bachelor's in Engineering (B.E.), ECE</span>
+          </div>
+          <div class="intro-stem"></div>
+          <div class="intro-marker"><span>2017</span><i></i><span>2021</span></div>
+          <div class="intro-stem ghost"></div>
+          <div class="intro-label ghost"></div>
+        </div>
+
+        <div class="intro-stop bottom">
+          <div class="intro-label ghost"></div>
+          <div class="intro-stem ghost"></div>
+          <div class="intro-marker"><span>2021</span><i></i><span>2023</span></div>
+          <div class="intro-stem"></div>
+          <div class="intro-label">
+            <span class="intro-org">🏢 Cognizant</span>
+            <span class="intro-role">Programmer Analyst</span>
+          </div>
+        </div>
+
+        <div class="intro-stop top">
+          <div class="intro-label">
+            <span class="intro-org">🏢 Cognizant</span>
+            <span class="intro-role">Associate</span>
+          </div>
+          <div class="intro-stem"></div>
+          <div class="intro-marker"><span>2023</span><i></i><span>2025</span></div>
+          <div class="intro-stem ghost"></div>
+          <div class="intro-label ghost"></div>
+        </div>
+
+        <div class="intro-stop bottom">
+          <div class="intro-label ghost"></div>
+          <div class="intro-stem ghost"></div>
+          <div class="intro-marker intro-marker-solo"><span>2025</span></div>
+          <div class="intro-stem"></div>
+          <div class="intro-label">
+            <span class="intro-org">🏛️ University of Arizona, Eller College</span>
+            <span class="intro-role">Technology Leadership Program · MS‑MIS + MBA</span>
+          </div>
+        </div>
+
+        <div class="intro-stop top">
+          <div class="intro-label">
+            <span class="intro-org">🏛️ University of Arizona, Eller College</span>
+            <span class="intro-role">Graduate Assistant</span>
+          </div>
+          <div class="intro-stem"></div>
+          <div class="intro-marker"><span>2025</span><i></i><span>Now</span></div>
+          <div class="intro-stem ghost"></div>
+          <div class="intro-label ghost"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="intro-foot">Scroll sideways to follow the timeline →</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
      HIRE MODAL
 ═══════════════════════════════════ -->
 <div class="m-overlay" id="hireModal" onclick="handleOverlayClick(event)">

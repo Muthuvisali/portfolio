@@ -362,8 +362,27 @@ function closeModal() {
 function handleOverlayClick(e) {
   if (e.target === modal) closeModal();
 }
+
+/* ── JOURNEY / "MY STORY" OVERLAY ── */
+const introOverlay = qs("#introOverlay");
+
+function openIntro() {
+  introOverlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeIntro() {
+  introOverlay.classList.remove("open");
+  document.body.style.overflow = "";
+}
+function handleIntroOverlayClick(e) {
+  if (e.target === introOverlay) closeIntro();
+}
+
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeModal();
+  if (e.key === "Escape") {
+    closeModal();
+    closeIntro();
+  }
 });
 function copyEmail(e) {
   e.stopPropagation();
