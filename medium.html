@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Writing — Muthuvisali Ravichandra Bose</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #F5EDE8; --bg-alt: #EDD9CF;
+      --text: #2D1B35; --text-2: #3D2645; --text-3: #6B3D5A; --muted: #C4A8B8;
+      --p50:#FBF5F8; --p100:#F5E8EF; --p200:#E8C4D4; --p300:#D4A0BE;
+      --p400:#A87898; --p500:#8B4F7A; --p600:#6B3D5A; --p700:#3D2645;
+      --p800:#2D1B35; --p900:#1A0F20;
+      --gold:#C4956A; --gold-h:#A87858;
+      --border:rgba(232,196,212,0.45); --border-h:rgba(107,61,90,0.5);
+      --sh-sm:0 2px 8px rgba(45,27,53,0.07);
+      --sh-md:0 8px 30px rgba(45,27,53,0.11);
+      --sh-lg:0 20px 60px rgba(45,27,53,0.14);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+    /* SCROLL BAR */
+    .scroll-bar { position:fixed; top:0; left:0; height:3px; width:0; background:linear-gradient(90deg,var(--gold),var(--p400)); z-index:10000; transition:width .1s linear; }
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:1000; padding:0 5%; background:rgba(26,15,32,0.94); backdrop-filter:blur(24px) saturate(160%); border-bottom:1px solid rgba(232,196,212,.1); }
+    .nav-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:66px; gap:16px; }
+    .nav-logo { font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:1.1rem; color:#fff; text-decoration:none; letter-spacing:-.02em; flex-shrink:0; }
+    .nav-logo span { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-back { display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.65); font-size:.78rem; font-weight:600; text-decoration:none; letter-spacing:.03em; padding:7px 14px; border-radius:100px; border:1px solid rgba(255,255,255,.15); transition:all .25s ease; white-space:nowrap; }
+    .nav-back:hover { color:#fff; background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3); }
+    .nav-actions { display:flex; align-items:center; gap:10px; }
+    .btn-nav-demo { display:inline-flex; align-items:center; gap:6px; font-size:.78rem; padding:9px 18px; background:linear-gradient(135deg,var(--gold),var(--gold-h)); color:#fff; border:none; border-radius:100px; font-weight:700; cursor:pointer; transition:all .3s ease; font-family:'Inter',sans-serif; text-decoration:none; }
+    .btn-nav-demo:hover { transform:translateY(-2px) scale(1.03); box-shadow:0 8px 28px rgba(196,149,106,.55); }
+
+    /* HERO */
+    #hero { min-height:56vh; display:flex; align-items:center; position:relative; overflow:hidden; padding:110px 5% 70px; background:linear-gradient(155deg,var(--p900) 0%,var(--p700) 60%,var(--p600) 100%); }
+    .hero-orb { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; }
+    .hero-orb-1 { width:520px; height:520px; background:radial-gradient(circle,rgba(196,149,106,.28),transparent 70%); top:-150px; right:-100px; animation:floatOrb 8s ease-in-out infinite; }
+    .hero-orb-2 { width:360px; height:360px; background:radial-gradient(circle,rgba(232,196,212,.12),transparent 70%); bottom:-80px; left:5%; animation:floatOrb 8s ease-in-out infinite; animation-delay:-4s; }
+    @keyframes floatOrb { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-28px) scale(1.06);} }
+    .hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.05) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    .hero-content { max-width:880px; margin:0 auto; position:relative; z-index:2; width:100%; text-align:center; }
+    .hero-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(196,149,106,.15); border:1px solid rgba(196,149,106,.3); padding:6px 18px; border-radius:100px; font-size:.72rem; color:var(--gold); font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:28px; }
+    .hero-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(2rem,4.5vw,3.6rem); font-weight:800; line-height:1.1; letter-spacing:-.03em; margin-bottom:18px; color:#fff; }
+    .hero-title .hl { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-sub { font-size:1rem; color:rgba(255,255,255,.65); max-width:640px; margin:0 auto 36px; line-height:1.75; }
+    .hero-stats { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+    .h-stat { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:8px 18px; font-size:.78rem; font-weight:600; color:rgba(255,255,255,.8); }
+    .h-stat strong { color:var(--gold); }
+
+    /* SECTIONS */
+    section { padding:88px 5%; }
+    section.dark { background:linear-gradient(155deg,var(--p900) 0%,var(--p700) 65%,var(--p500) 100%); position:relative; overflow:hidden; }
+    section.dark::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.04) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    .sec-inner { max-width:840px; margin:0 auto; position:relative; z-index:1; }
+    .sec-tag { display:inline-flex; align-items:center; gap:8px; font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--p600); margin-bottom:10px; }
+    .sec-tag::before { content:''; width:18px; height:2px; background:var(--gold); border-radius:2px; }
+    .dark .sec-tag { color:rgba(255,255,255,.5); }
+    .sec-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.7rem,3vw,2.5rem); font-weight:800; letter-spacing:-.03em; color:var(--text); margin-bottom:14px; line-height:1.15; }
+    .dark .sec-title { color:#fff; }
+    .sec-title .ac { background:linear-gradient(135deg,var(--p700),var(--p400)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .sec-lead { font-size:.95rem; color:var(--text-3); line-height:1.85; max-width:680px; margin-bottom:44px; }
+    .dark .sec-lead { color:rgba(255,255,255,.65); max-width:520px; margin:0 auto 30px; }
+
+    /* POST CARDS */
+    .posts-grid { display:flex; flex-direction:column; gap:20px; }
+    .post-card {
+      background:#fff; border:1px solid var(--border); border-radius:18px; padding:30px;
+      transition:all .3s ease; opacity:0; transform:translateY(24px);
+      transition:opacity .6s ease, transform .6s cubic-bezier(.34,1.56,.64,1), border-color .3s ease, box-shadow .3s ease;
+    }
+    .post-card.vis { opacity:1; transform:translateY(0); }
+    .post-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-4px); }
+    .post-meta { display:inline-flex; align-items:center; gap:6px; font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+    .post-card h3 { font-family:'Space Grotesk',sans-serif; font-size:1.25rem; font-weight:700; color:var(--text); margin-bottom:10px; line-height:1.3; }
+    .post-card p { font-size:.88rem; color:var(--text-3); line-height:1.8; margin-bottom:18px; }
+    .post-tags { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; }
+    .post-tag { font-size:.7rem; font-weight:600; color:var(--text-2); background:var(--p50); border:1px solid var(--border); padding:4px 11px; border-radius:7px; white-space:nowrap; }
+    .post-links { display:flex; gap:10px; flex-wrap:wrap; }
+    .post-link {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.76rem; font-weight:700; text-decoration:none;
+      border:1.5px solid rgba(196,149,106,.35); border-radius:100px;
+      padding:9px 18px; transition:all .25s ease; color:var(--gold);
+    }
+    .post-link:hover { background:rgba(196,149,106,.1); border-color:var(--gold); transform:translateY(-2px); box-shadow:0 4px 14px rgba(196,149,106,.2); }
+    .post-link.alt { color:var(--p600); border-color:var(--border); }
+    .post-link.alt:hover { background:var(--p50); border-color:var(--p400); box-shadow:none; }
+
+    /* NEWSLETTER CTA */
+    .nl-cta { text-align:center; }
+    .nl-form { display:inline-flex; }
+
+    /* FOOTER */
+    footer { background:var(--p900); border-top:1px solid rgba(255,255,255,.06); padding:24px 5%; text-align:center; }
+    footer p { font-size:.8rem; color:rgba(255,255,255,.3); }
+    footer a { color:rgba(255,255,255,.5); text-decoration:none; transition:color .2s ease; }
+    footer a:hover { color:#fff; }
+
+    @media (max-width:640px) {
+      .hero-sub { font-size:.9rem; }
+      .post-card { padding:22px; }
+      .post-card h3 { font-size:1.08rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-bar" id="scrollBar"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">MRB<span>.</span></a>
+    <a href="index.html#writing" class="nav-back">← Back to Portfolio</a>
+    <div class="nav-actions">
+      <a href="https://visali-newsletter.beehiiv.com/" target="_blank" rel="noopener" class="btn-nav-demo">📩 Subscribe</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-content">
+    <div class="hero-tag">✦ Writing</div>
+    <h1 class="hero-title">Deep Learning,<br/><span class="hl">Explained Simply</span></h1>
+    <p class="hero-sub">
+      A weekly series breaking down machine learning concepts in plain language, each paired with an
+      interactive demo so the intuition sticks. New post every week.
+    </p>
+    <div class="hero-stats">
+      <div class="h-stat"><strong>2</strong> Posts Published</div>
+      <div class="h-stat"><strong>Weekly</strong> Cadence</div>
+      <div class="h-stat"><strong>Interactive</strong> Demos</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ POSTS ═══ -->
+<section>
+  <div class="sec-inner">
+    <div class="sec-tag">All Posts</div>
+    <h2 class="sec-title">Latest <span class="ac">Essays</span></h2>
+    <p class="sec-lead">
+      Newest first. Each post comes with an interactive visual you can play with to build real intuition,
+      not just read theory.
+    </p>
+
+    <div class="posts-grid">
+
+      <!-- NEW POSTS GO HERE — newest first, copy this card and update -->
+      <div class="post-card fu">
+        <div class="post-meta">📍 Week 2 · Deep Learning, Explained Simply</div>
+        <h3>My Loss Went Down, My Model Didn't Improve</h3>
+        <p>
+          Why a falling training loss doesn't guarantee a better model, and how to tell when your validation
+          metric is flat because the signal isn't there. Includes an interactive demo where you control how
+          separable two classes of data are and watch the validation error rate over training, at low
+          separation, the model has nothing to find, no matter how long it trains.
+        </p>
+        <div class="post-tags">
+          <span class="post-tag">Model Evaluation</span>
+          <span class="post-tag">Overfitting</span>
+          <span class="post-tag">Validation Strategy</span>
+          <span class="post-tag">Deep Learning</span>
+        </div>
+        <div class="post-links">
+          <a href="https://medium.com/@visaliravi4/my-loss-went-down-my-model-didnt-improve-b26916575cc7" target="_blank" rel="noopener" class="post-link">📝 Read on Medium →</a>
+          <a href="Medium/dl-week2-animation.html" target="_blank" rel="noopener" class="post-link alt">🎛️ Try the Interactive Demo →</a>
+        </div>
+      </div>
+
+      <div class="post-card fu" style="transition-delay:.08s">
+        <div class="post-meta">📍 Week 1 · Deep Learning, Explained Simply</div>
+        <h3>How a Neural Network Actually Learns</h3>
+        <p>
+          Breaking down backpropagation, gradients, and weight updates in plain language, paired with an
+          interactive visual to build real intuition for how a network "learns" from data.
+        </p>
+        <div class="post-tags">
+          <span class="post-tag">Deep Learning</span>
+          <span class="post-tag">Neural Networks</span>
+          <span class="post-tag">Backpropagation</span>
+        </div>
+        <div class="post-links">
+          <a href="https://medium.com/@visaliravi4/how-a-neural-network-actually-learns-7fc9fad67aad" target="_blank" rel="noopener" class="post-link">📝 Read on Medium →</a>
+          <a href="Medium/dl-week1-animation.html" target="_blank" rel="noopener" class="post-link alt">🎛️ Try the Interactive Demo →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NEWSLETTER ═══ -->
+<section class="dark">
+  <div class="sec-inner nl-cta">
+    <div class="sec-tag" style="justify-content:center">Newsletter</div>
+    <h2 class="sec-title">Don't Miss<br/><span class="ac" style="background:linear-gradient(135deg,var(--gold),#E8C4D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">The Next Post</span></h2>
+    <p class="sec-lead">
+      Get every new essay delivered straight to your inbox, plus occasional notes on product, AI systems,
+      and what I'm building.
+    </p>
+    <a href="https://visali-newsletter.beehiiv.com/" target="_blank" rel="noopener" class="btn-nav-demo" style="padding:13px 30px; font-size:.9rem;">📩 Subscribe to the Newsletter</a>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="index.html">← Back to Portfolio</a> &nbsp;·&nbsp;
+    Muthuvisali Ravichandra Bose &nbsp;·&nbsp; Product Manager &amp; AI Builder
+  </p>
+</footer>
+
+<script>
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    document.getElementById('scrollBar').style.width = pct + '%';
+  });
+
+  // Scroll-in animation
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fu').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
