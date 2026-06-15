@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Variation vs Error Rate — Interactive Demo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f1117;
+    color: #e8e8e8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 64px;
+  }
+  h1 { font-size: 22px; font-weight: 600; text-align: center; margin-bottom: 6px; color: #f0f0f0; }
+  .subtitle { font-size: 13px; color: #888; text-align: center; margin-bottom: 28px; max-width: 560px; line-height: 1.6; }
+
+  .card {
+    background: #1a1d27;
+    border: 1px solid #2a2d3e;
+    border-radius: 14px;
+    padding: 24px 28px;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 16px;
+  }
+
+  /* SLIDER */
+  .slider-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .slider-row label { font-size: 14px; color: #ccc; min-width: 180px; }
+  input[type=range] { flex: 1; accent-color: #534AB7; height: 6px; }
+  #sepOut { font-size: 16px; font-weight: 600; min-width: 48px; text-align: right; color: #fff; }
+
+  /* STATS */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .stat {
+    background: #12141e;
+    border: 1px solid #2a2d3e;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .stat-val { font-size: 26px; font-weight: 600; }
+
+  canvas { display: block; }
+
+  .legend { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+  .leg { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #888; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .explain {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #ccc;
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #12141e;
+    border-radius: 8px;
+    border-left: 3px solid #333;
+    transition: border-color .3s;
+  }
+</style>
+</head>
+<body>
+
+<h1>Does the data even contain the difference?</h1>
+<p class="subtitle">Drag the slider to control how separated two classes of data are. Watch what happens to the validation error rate over 10 training epochs. At low separation, the model has nothing to find, no matter how long it trains.</p>
+
+<div class="card">
+  <div class="card-title">Two classes of data points</div>
+
+  <div class="slider-row">
+    <label for="sep">Separation between classes</label>
+    <input type="range" min="0" max="100" value="8" id="sep" />
+    <span id="sepOut">8%</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Validation error rate (epoch 9)</div>
+      <div class="stat-val" id="errOut">0.750</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">What the model can find</div>
+      <div class="stat-val" id="statusOut">Nothing</div>
+    </div>
+  </div>
+
+  <div style="position:relative; width:100%; height:240px;">
+    <canvas id="scatter" role="img" aria-label="Scatter plot of two classes of data points with separation controlled by the slider">Two clusters of points representing two classes. At low separation they overlap almost entirely. At high separation they form two distinct groups.</canvas>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="dot" style="background:#a78bfa"></div>Class A</div>
+    <div class="leg"><div class="dot" style="background:#f87171"></div>Class B</div>
+  </div>
+
+  <div class="explain" id="explainBox">
+    At 8% separation, the two classes occupy almost the same space. A model searching for a pattern that separates them will not find one, because there is barely a pattern to find.
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Validation error rate over 10 epochs</div>
+  <div style="position:relative; width:100%; height:220px;">
+    <canvas id="errChart" role="img" aria-label="Line chart showing validation error rate over 10 training epochs, which stays flat when class separation is low and decreases when separation is high">Error rate over 10 epochs. At low separation the line stays flat at 0.75. At high separation it decreases toward 0.</canvas>
+  </div>
+</div>
+
+<script>
+const sepSlider = document.getElementById('sep');
+const sepOut = document.getElementById('sepOut');
+const errOut = document.getElementById('errOut');
+const statusOut = document.getElementById('statusOut');
+const explainBox = document.getElementById('explainBox');
+
+const scatterCtx = document.getElementById('scatter');
+const errCtx = document.getElementById('errChart');
+
+function genPoints(n, centerX, centerY) {
+  const spread = 0.9;
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    pts.push({
+      x: centerX + (Math.random()-0.5) * spread * 2,
+      y: centerY + (Math.random()-0.5) * spread * 2
+    });
+  }
+  return pts;
+}
+
+let scatterChart, errChart;
+
+function computeOffset(sep) {
+  return (sep/100) * 3.5;
+}
+
+function computeErrorCurve(sep) {
+  const offset = computeOffset(sep);
+  const separability = Math.min(1, offset / 3.5);
+  const curve = [];
+  let err = 0.75;
+  for (let e = 0; e <= 9; e++) {
+    if (separability < 0.12) {
+      err = 0.75;
+    } else {
+      const target = Math.max(0.05, 0.75 - separability*0.75);
+      err = err + (target - err) * (0.35 + separability*0.4);
+    }
+    curve.push(Math.round(err*1000)/1000);
+  }
+  return curve;
+}
+
+function update() {
+  const sep = parseInt(sepSlider.value);
+  sepOut.textContent = sep + '%';
+  const offset = computeOffset(sep);
+
+  const classA = genPoints(16, 3 - offset/2, 3);
+  const classB = genPoints(16, 3 + offset/2, 3);
+
+  scatterChart.data.datasets[0].data = classA;
+  scatterChart.data.datasets[1].data = classB;
+  scatterChart.update();
+
+  const curve = computeErrorCurve(sep);
+  errChart.data.datasets[0].data = curve;
+  errChart.update();
+
+  const finalErr = curve[curve.length-1];
+  errOut.textContent = finalErr.toFixed(3);
+
+  if (sep < 12) {
+    statusOut.textContent = 'Nothing';
+    errOut.style.color = '#f87171';
+    explainBox.style.borderLeftColor = '#f87171';
+    explainBox.textContent = 'At ' + sep + '% separation, the two classes occupy almost the same space. A model searching for a pattern that separates them will not find one, because there is barely a pattern to find. This is exactly what a flat error rate of 0.750 across every epoch looks like.';
+  } else if (sep < 50) {
+    statusOut.textContent = 'A weak signal';
+    errOut.style.color = '#fb923c';
+    explainBox.style.borderLeftColor = '#fb923c';
+    explainBox.textContent = 'At ' + sep + '% separation, there is some difference between the classes, but it is faint. The model can start to use it, and the error rate begins to move, slowly and unevenly.';
+  } else {
+    statusOut.textContent = 'A clear pattern';
+    errOut.style.color = '#4ade80';
+    explainBox.style.borderLeftColor = '#4ade80';
+    explainBox.textContent = 'At ' + sep + '% separation, the two classes are visibly distinct. The model has something real to learn, and the error rate drops steadily across epochs as training proceeds.';
+  }
+}
+
+scatterChart = new Chart(scatterCtx, {
+  type: 'scatter',
+  data: {
+    datasets: [
+      { label: 'Class A', data: [], backgroundColor: '#a78bfa', pointRadius: 6 },
+      { label: 'Class B', data: [], backgroundColor: '#f87171', pointRadius: 6 }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { min: -1, max: 7, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { min: -1, max: 7, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } }
+    },
+    plugins: { legend: { display: false } },
+    animation: { duration: 300 }
+  }
+});
+
+errChart = new Chart(errCtx, {
+  type: 'line',
+  data: {
+    labels: ['0','1','2','3','4','5','6','7','8','9'],
+    datasets: [{
+      label: 'Validation error rate',
+      data: [],
+      borderColor: '#a78bfa',
+      backgroundColor: 'rgba(167,139,250,0.12)',
+      borderWidth: 2.5,
+      pointRadius: 4,
+      pointBackgroundColor: '#a78bfa',
+      fill: true,
+      tension: 0.2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { title: { display: true, text: 'epoch', color: '#888', font: { size: 12 } }, ticks: { color: '#888' }, grid: { display: false } },
+      y: { min: 0, max: 0.8, title: { display: true, text: 'error rate', color: '#888', font: { size: 12 } }, ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+    },
+    plugins: { legend: { display: false } },
+    animation: { duration: 300 }
+  }
+});
+
+sepSlider.addEventListener('input', update);
+update();
+</script>
+</body>
+</html>
