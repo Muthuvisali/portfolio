@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>From Clicks to Conversations — Muthuvisali Ravichandra Bose</title>
+  <meta name="description" content="From Clicks to Conversations: designing an advertising system for AI native Search. A public data product hypothesis and working prototype by Muthuvisali Ravichandra Bose."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #F5EDE8; --bg-alt: #EDD9CF;
+      --text: #2D1B35; --text-2: #3D2645; --text-3: #6B3D5A; --muted: #C4A8B8;
+      --p50:#FBF5F8; --p100:#F5E8EF; --p200:#E8C4D4; --p300:#D4A0BE;
+      --p400:#A87898; --p500:#8B4F7A; --p600:#6B3D5A; --p700:#3D2645;
+      --p800:#2D1B35; --p900:#1A0F20;
+      --gold:#C4956A; --gold-h:#A87858;
+      --border:rgba(232,196,212,0.45); --border-h:rgba(107,61,90,0.5);
+      --sh-sm:0 2px 8px rgba(45,27,53,0.07);
+      --sh-md:0 8px 30px rgba(45,27,53,0.11);
+      --sh-lg:0 20px 60px rgba(45,27,53,0.14);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+    /* SCROLL BAR */
+    .scroll-bar { position:fixed; top:0; left:0; height:3px; width:0; background:linear-gradient(90deg,var(--gold),var(--p400)); z-index:10000; transition:width .1s linear; }
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:1000; padding:0 5%; background:rgba(26,15,32,0.94); backdrop-filter:blur(24px) saturate(160%); border-bottom:1px solid rgba(232,196,212,.1); }
+    .nav-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:66px; gap:16px; }
+    .nav-logo { font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:1.1rem; color:#fff; text-decoration:none; letter-spacing:-.02em; flex-shrink:0; }
+    .nav-logo span { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-back { display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.65); font-size:.78rem; font-weight:600; text-decoration:none; letter-spacing:.03em; padding:7px 14px; border-radius:100px; border:1px solid rgba(255,255,255,.15); transition:all .25s ease; white-space:nowrap; }
+    .nav-back:hover { color:#fff; background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3); }
+    .nav-actions { display:flex; align-items:center; gap:10px; }
+    .btn-nav-gh { display:inline-flex; align-items:center; gap:6px; font-size:.78rem; padding:8px 16px; background:transparent; color:rgba(255,255,255,.75); border:1.5px solid rgba(255,255,255,.25); border-radius:100px; font-weight:700; cursor:pointer; transition:all .3s ease; font-family:'Inter',sans-serif; }
+    .btn-nav-gh:hover { background:rgba(255,255,255,.1); color:#fff; border-color:rgba(255,255,255,.5); transform:translateY(-2px); }
+
+    /* HERO */
+    #hero { min-height:72vh; display:flex; align-items:center; position:relative; overflow:hidden; padding:110px 5% 80px; background:linear-gradient(155deg,var(--p900) 0%,var(--p700) 60%,var(--p600) 100%); }
+    .hero-orb { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; }
+    .hero-orb-1 { width:520px; height:520px; background:radial-gradient(circle,rgba(196,149,106,.28),transparent 70%); top:-150px; right:-100px; animation:floatOrb 8s ease-in-out infinite; }
+    .hero-orb-2 { width:360px; height:360px; background:radial-gradient(circle,rgba(232,196,212,.12),transparent 70%); bottom:-80px; left:5%; animation:floatOrb 8s ease-in-out infinite; animation-delay:-4s; }
+    @keyframes floatOrb { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-28px) scale(1.06);} }
+    .hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.05) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    .hero-content { max-width:1000px; margin:0 auto; position:relative; z-index:2; width:100%; text-align:center; }
+    .hero-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(196,149,106,.15); border:1px solid rgba(196,149,106,.3); padding:6px 18px; border-radius:100px; font-size:.72rem; color:var(--gold); font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:28px; }
+    .hero-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(2rem,4.5vw,3.8rem); font-weight:800; line-height:1.1; letter-spacing:-.03em; margin-bottom:18px; color:#fff; }
+    .hero-title .hl { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-sub { font-size:1rem; color:rgba(255,255,255,.65); max-width:680px; margin:0 auto 36px; line-height:1.75; }
+    .hero-stats { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:40px; }
+    .h-stat { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:8px 18px; font-size:.78rem; font-weight:600; color:rgba(255,255,255,.8); }
+    .h-stat strong { color:var(--gold); }
+    .hero-btns { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+    .btn-hero-gh { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:100px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; transition:all .3s ease; text-decoration:none; }
+    .btn-hero-gh:hover { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.45); transform:translateY(-3px); }
+    .hero-deck { font-size:.82rem; color:rgba(255,255,255,.45); font-style:italic; margin:-22px auto 28px; }
+    .hero-byline { font-size:.78rem; font-weight:600; color:rgba(255,255,255,.55); letter-spacing:.03em; margin-bottom:32px; }
+    .hero-byline strong { color:#fff; font-weight:700; }
+
+    /* SECTIONS */
+    section.light { background:#fff; }
+    section.cream { background:var(--bg); }
+    section.dark { background:linear-gradient(155deg,var(--p900) 0%,var(--p700) 65%,var(--p500) 100%); position:relative; overflow:hidden; }
+    section.dark::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.04) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    section { padding:88px 5%; }
+    .sec-inner { max-width:1100px; margin:0 auto; position:relative; z-index:1; }
+    .sec-tag { display:inline-flex; align-items:center; gap:8px; font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--p600); margin-bottom:10px; }
+    .sec-tag::before { content:''; width:18px; height:2px; background:var(--gold); border-radius:2px; }
+    .dark .sec-tag { color:rgba(255,255,255,.5); }
+    .sec-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.7rem,3vw,2.5rem); font-weight:800; letter-spacing:-.03em; color:var(--text); margin-bottom:14px; line-height:1.15; }
+    .dark .sec-title { color:#fff; }
+    .sec-title .ac { background:linear-gradient(135deg,var(--p700),var(--p400)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .sec-title .ac-gold { background:linear-gradient(135deg,var(--gold),#E8C4D4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .sec-lead { font-size:.95rem; color:var(--text-3); line-height:1.85; max-width:740px; margin-bottom:44px; }
+    .dark .sec-lead { color:rgba(255,255,255,.65); }
+    .sub-hd { font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:700; color:var(--text); margin:44px 0 14px; letter-spacing:-.01em; }
+    .dark .sub-hd { color:#fff; }
+    .body-p { font-size:.9rem; color:var(--text-3); line-height:1.85; max-width:780px; margin-bottom:22px; }
+
+    /* PROBLEM */
+    .tension-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:32px; }
+    .tension-grid.two { grid-template-columns:repeat(2,1fr); }
+    .tension-card { background:var(--bg); border:1px solid var(--border); border-radius:18px; padding:26px; transition:all .3s ease; }
+    .cream .tension-card { background:#fff; }
+    .tension-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .t-label { font-size:.66rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+    .tension-card h4 { font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700; color:var(--text); margin-bottom:8px; }
+    .tension-card p { font-size:.83rem; color:var(--text-3); line-height:1.65; }
+    .callout { background:linear-gradient(135deg,var(--p900) 0%,var(--p700) 100%); border-radius:22px; padding:30px 36px; border:1px solid rgba(232,196,212,.12); margin-bottom:32px; }
+    .callout-ttl { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; color:#fff; margin-bottom:10px; }
+    .callout p { font-size:.9rem; color:rgba(255,255,255,.7); line-height:1.85; }
+    .callout strong { color:var(--gold); }
+
+    /* SCOPE NOTE */
+    section.scope { padding:40px 5%; }
+    .scope-note { display:flex; gap:16px; align-items:flex-start; background:rgba(196,149,106,.08); border:1.5px solid rgba(196,149,106,.35); border-left:4px solid var(--gold); border-radius:16px; padding:22px 26px; }
+    .scope-ico { font-size:1.2rem; line-height:1.4; flex-shrink:0; }
+    .scope-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--p600); margin-bottom:6px; }
+    .scope-note p { font-size:.92rem; color:var(--text-2); line-height:1.75; font-weight:500; }
+
+    /* SUMMARY ROWS */
+    .sum-list { display:flex; flex-direction:column; gap:14px; margin-bottom:32px; }
+    .sum-row { display:grid; grid-template-columns:180px 1fr; gap:24px; background:var(--bg); border:1px solid var(--border); border-radius:18px; padding:22px 26px; transition:all .3s ease; }
+    .sum-row:hover { border-color:var(--border-h); box-shadow:var(--sh-md); }
+    .sum-row .t-label { margin:3px 0 0; }
+    .sum-row p { font-size:.88rem; color:var(--text-3); line-height:1.75; }
+    .sum-row p strong { color:var(--text); }
+
+    /* FIGURES */
+    .fig { margin:0 0 36px; }
+    .fig-frame { display:block; background:#fff; border:1px solid var(--border); border-radius:20px; padding:14px; box-shadow:var(--sh-sm); transition:all .3s ease; }
+    .fig-frame:hover { border-color:var(--border-h); box-shadow:var(--sh-md); }
+    .fig img { display:block; width:100%; height:auto; border-radius:10px; }
+    .fig figcaption { font-size:.78rem; color:var(--text-3); line-height:1.65; margin-top:12px; max-width:780px; }
+    .fig figcaption strong { color:var(--text); }
+
+    /* DATA TABLES */
+    .tbl-wrap { background:#fff; border:1px solid var(--border); border-radius:18px; overflow:hidden; margin-bottom:28px; box-shadow:var(--sh-sm); }
+    .dt { width:100%; border-collapse:collapse; font-size:.84rem; }
+    .dt th { text-align:left; font-size:.66rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--p600); background:var(--p50); padding:14px 18px; border-bottom:1px solid var(--border); }
+    .dt td { padding:14px 18px; color:var(--text-3); line-height:1.6; vertical-align:top; border-bottom:1px solid var(--border); overflow-wrap:anywhere; }
+    .dt tr:last-child td { border-bottom:none; }
+    .dt td:first-child { font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--text); }
+    .dark .tbl-wrap { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.12); box-shadow:none; }
+    .dark .dt th { background:rgba(0,0,0,.25); color:rgba(255,255,255,.5); border-bottom-color:rgba(255,255,255,.1); }
+    .dark .dt td { color:rgba(255,255,255,.65); border-bottom-color:rgba(255,255,255,.08); }
+    .dark .dt td:first-child { color:#fff; }
+    .pill { display:inline-block; font-family:'Inter',sans-serif; font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:100px; white-space:nowrap; }
+    .pill.green { background:rgba(34,197,94,.1); color:#16a34a; border:1px solid rgba(34,197,94,.2); }
+    .pill.gold { background:rgba(196,149,106,.12); color:var(--gold-h); border:1px solid rgba(196,149,106,.3); }
+    .pill.plum { background:var(--p100); color:var(--p600); border:1px solid var(--p200); }
+    .pill.red { background:rgba(220,38,38,.08); color:#b91c1c; border:1px solid rgba(220,38,38,.2); }
+    .cite { font-size:.72em; font-weight:700; color:var(--gold-h); text-decoration:none; vertical-align:super; line-height:0; }
+    .cite:hover { text-decoration:underline; }
+    .dark .cite { color:var(--gold); }
+
+    /* DOES NOT CLAIM */
+    .not-claim { background:#fff; border:1.5px dashed var(--p300); border-radius:18px; padding:24px 28px; }
+    .not-claim .t-label { color:var(--p600); display:flex; align-items:center; gap:8px; }
+    .not-claim ul { list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+    .not-claim li { font-size:.86rem; color:var(--text-3); line-height:1.6; padding-left:20px; position:relative; }
+    .not-claim li::before { content:'✕'; position:absolute; left:0; color:var(--p400); font-weight:700; font-size:.78rem; top:1px; }
+
+    /* MODEL SHIFT */
+    .model-shift { display:grid; grid-template-columns:1fr auto 1fr; gap:18px; align-items:stretch; margin-bottom:32px; }
+    .model-card { background:var(--bg); border:1px solid var(--border); border-radius:18px; padding:24px 26px; }
+    .model-card.new { background:linear-gradient(135deg,rgba(245,237,232,.9),rgba(232,196,212,.6)); border-color:rgba(107,61,90,.25); }
+    .model-flow { font-family:'Space Grotesk',sans-serif; font-size:.92rem; font-weight:700; color:var(--text); line-height:1.7; }
+    .model-arrow { display:flex; align-items:center; color:var(--p400); font-size:1.4rem; font-weight:700; }
+
+    /* SURFACES */
+    .surface-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:12px; }
+    .surface { background:#fff; border:1px solid var(--border); border-radius:16px; padding:20px 22px; border-top:3px solid var(--p300); }
+    .surface.sp { border-top-color:var(--gold); }
+    .surface h4 { font-family:'Space Grotesk',sans-serif; font-size:.92rem; font-weight:700; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .surface p { font-size:.82rem; color:var(--text-3); line-height:1.65; }
+    .note { font-size:.8rem; color:var(--text-3); line-height:1.65; max-width:780px; }
+
+    /* GOVERNANCE-STYLE CARDS (dark) */
+    .gov-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:36px; }
+    .gc { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:18px 20px; display:flex; align-items:flex-start; gap:12px; transition:background .25s ease; }
+    .gc:hover { background:rgba(255,255,255,.1); }
+    .gc-n { width:26px; height:26px; border-radius:8px; flex-shrink:0; background:rgba(196,149,106,.2); border:1px solid rgba(196,149,106,.3); color:var(--gold); font-size:.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .gc-ttl { font-size:.85rem; font-weight:700; color:#fff; margin-bottom:4px; }
+    .gc-desc { font-size:.78rem; color:rgba(255,255,255,.5); line-height:1.55; }
+
+    /* ARCHITECTURE COMPONENTS */
+    .comp-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .comp { background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:18px 20px; display:flex; gap:12px; align-items:flex-start; transition:all .3s ease; }
+    .comp:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .comp-n { width:28px; height:28px; border-radius:8px; flex-shrink:0; background:linear-gradient(135deg,var(--p700),var(--p500)); color:#fff; font-size:.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .comp-n.g { background:linear-gradient(135deg,var(--gold),var(--gold-h)); }
+    .comp-ttl { font-family:'Space Grotesk',sans-serif; font-size:.9rem; font-weight:700; color:var(--text); margin-bottom:3px; }
+    .comp-desc { font-size:.8rem; color:var(--text-3); line-height:1.6; }
+
+    /* FORMULA / CODE */
+    .formula { background:var(--p900); border:1px solid rgba(232,196,212,.12); border-radius:18px; padding:26px 30px; margin-bottom:18px; }
+    .formula-eq { font-family:'Courier New',monospace; font-size:clamp(.95rem,2.4vw,1.25rem); font-weight:700; color:var(--gold); overflow-wrap:anywhere; }
+    .formula-legend { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:14px; font-size:.78rem; color:rgba(255,255,255,.6); }
+    .formula-legend b { color:#93c5fd; font-family:'Courier New',monospace; }
+    .code { background:var(--p900); color:#e8dce4; border-radius:16px; padding:22px 26px; font-family:'Courier New',monospace; font-size:.8rem; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere; margin-bottom:28px; border:1px solid rgba(232,196,212,.12); }
+    .code .k { color:#93c5fd; }
+    .code .s { color:#4ade80; }
+    .code .n { color:var(--gold); }
+    .hard-rule { display:flex; gap:12px; align-items:flex-start; background:rgba(196,149,106,.08); border:1.5px solid rgba(196,149,106,.3); border-radius:14px; padding:16px 20px; margin-bottom:28px; font-size:.86rem; color:var(--text-2); line-height:1.65; }
+    .hard-rule strong { color:var(--gold-h); }
+
+    /* BUSINESS IMPACT STYLE LISTS */
+    .impact-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:32px; }
+    .impact-card { background:#fff; border:1px solid var(--border); border-radius:20px; padding:28px; transition:all .3s ease; }
+    .light .impact-card { background:var(--bg); }
+    .impact-card:hover { border-color:var(--border-h); box-shadow:var(--sh-md); transform:translateY(-3px); }
+    .impact-hd { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .impact-ico { font-size:1.5rem; }
+    .impact-ttl { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; color:var(--text); }
+    .impact-list { list-style:none; display:flex; flex-direction:column; gap:9px; }
+    .impact-list li { font-size:.84rem; color:var(--text-3); line-height:1.6; padding-left:16px; position:relative; }
+    .impact-list li::before { content:'›'; position:absolute; left:0; color:var(--gold); font-weight:700; }
+    .impact-list li strong { color:var(--text); }
+
+    /* VERDICT STRIP */
+    .verdict-strip { background:linear-gradient(135deg,var(--p800),var(--p700)); border-radius:20px; padding:28px 36px; display:flex; align-items:center; gap:0; flex-wrap:wrap; margin-bottom:32px; }
+    .vs-left { padding-right:36px; }
+    .vs-label { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.45); margin-bottom:6px; }
+    .vs-decision { font-family:'Space Grotesk',sans-serif; font-size:1.8rem; font-weight:800; color:#fff; letter-spacing:-.02em; }
+    .vs-divider { width:1px; height:48px; background:rgba(255,255,255,.12); margin:0 36px; flex-shrink:0; }
+    .vs-stat { display:flex; flex-direction:column; gap:5px; }
+    .vs-num { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:800; color:var(--gold); }
+    .vs-desc { font-size:.76rem; color:rgba(255,255,255,.5); font-weight:500; }
+
+    /* SOURCES */
+    .src-list { list-style:none; counter-reset:src; display:flex; flex-direction:column; gap:12px; max-width:880px; }
+    .src-list li { counter-increment:src; display:grid; grid-template-columns:36px 1fr; gap:12px; align-items:start; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:14px 18px; font-size:.85rem; color:var(--text-3); line-height:1.6; scroll-margin-top:90px; }
+    .src-list li::before { content:counter(src); width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--p700),var(--p500)); color:#fff; font-size:.72rem; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .src-list li:target { border-color:var(--gold); box-shadow:0 0 0 3px rgba(196,149,106,.18); }
+    .src-list a { color:var(--p600); font-weight:600; text-decoration:none; border-bottom:1px solid var(--p200); overflow-wrap:anywhere; }
+    .src-list a:hover { color:var(--gold-h); border-bottom-color:var(--gold); }
+
+    /* CTA BOTTOM */
+    #cta { background:var(--p900); padding:80px 5%; text-align:center; position:relative; overflow:hidden; }
+    #cta::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(232,196,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,212,.04) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+    .cta-inner { max-width:600px; margin:0 auto; position:relative; z-index:1; }
+    .cta-ttl { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.6rem,3vw,2.5rem); font-weight:800; color:#fff; margin-bottom:12px; letter-spacing:-.03em; }
+    .cta-sub { font-size:.95rem; color:rgba(255,255,255,.5); margin-bottom:36px; line-height:1.75; }
+    .cta-btns { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+    .btn-case-study { display:inline-flex; align-items:center; gap:8px; padding:13px 26px; border-radius:100px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.18); color:rgba(255,255,255,.75); font-size:.9rem; font-weight:700; text-decoration:none; font-family:'Inter',sans-serif; transition:all .3s ease; }
+    .btn-case-study:hover { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.35); transform:translateY(-3px); color:#fff; }
+
+    /* FOOTER */
+    footer { background:var(--p900); border-top:1px solid rgba(255,255,255,.06); padding:24px 5%; text-align:center; }
+    footer p { font-size:.8rem; color:rgba(255,255,255,.3); }
+    footer a { color:rgba(255,255,255,.5); text-decoration:none; transition:color .2s ease; }
+    footer a:hover { color:#fff; }
+
+    /* SCROLL ANIMATION */
+    .fu { opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s cubic-bezier(.34,1.56,.64,1); }
+    .fu.vis { opacity:1; transform:translateY(0); }
+    .delay-1 { transition-delay:.08s !important; }
+    .delay-2 { transition-delay:.16s !important; }
+    .delay-3 { transition-delay:.24s !important; }
+    .delay-4 { transition-delay:.32s !important; }
+    .delay-5 { transition-delay:.40s !important; }
+
+    /* RESPONSIVE */
+    @media(max-width:768px) {
+      .tension-grid,.tension-grid.two,.gov-grid,.comp-grid,.impact-grid,.surface-row { grid-template-columns:1fr; }
+      .sum-row { grid-template-columns:1fr; gap:6px; }
+      .model-shift { grid-template-columns:1fr; }
+      .model-arrow { justify-content:center; transform:rotate(90deg); }
+      .verdict-strip { gap:20px; }
+      .vs-divider { display:none; }
+      section { padding:64px 5%; }
+      section.scope { padding:32px 5%; }
+      .callout { padding:24px 22px; }
+      .formula { padding:22px; }
+
+      /* Tables stack into labelled cards: no horizontal scrolling */
+      .dt thead { display:none; }
+      .dt, .dt tbody, .dt tr, .dt td { display:block; width:100%; }
+      .dt tr { padding:16px 18px; border-bottom:1px solid var(--border); }
+      .dark .dt tr { border-bottom-color:rgba(255,255,255,.08); }
+      .dt tr:last-child { border-bottom:none; }
+      .dt td { padding:3px 0; border-bottom:none; }
+      .dt td + td { margin-top:8px; }
+      .dt td::before { content:attr(data-label); display:block; font-family:'Inter',sans-serif; font-size:.6rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+      .dark .dt td::before { color:rgba(255,255,255,.4); }
+      .dt td:first-child { font-size:.95rem; }
+    }
+    @media(max-width:480px) {
+      .nav-actions { display:none; }
+      .scope-note { flex-direction:column; gap:8px; padding:18px 20px; }
+      .fig-frame { padding:8px; border-radius:14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-bar" id="scrollBar"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">MRB<span>.</span></a>
+    <a href="index.html#projects" class="nav-back">← Back to Portfolio</a>
+    <div class="nav-actions">
+      <a href="https://github.com/Muthuvisali/MicroIntent_Prototype_v0.2.1" target="_blank" rel="noopener" class="btn-nav-gh">⌥ Prototype repository</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-content">
+    <div class="hero-tag">🔎 Independent Case Study · AI Search Monetization</div>
+    <h1 class="hero-title">
+      From Clicks to <span class="hl">Conversations</span>
+    </h1>
+    <p class="hero-sub">Designing an advertising system for AI native Search</p>
+    <p class="hero-deck">A public data product hypothesis and working prototype</p>
+    <p class="hero-byline">By <strong>Muthuvisali Ravichandra Bose</strong> &nbsp;·&nbsp; Product and AI Systems</p>
+    <div class="hero-stats">
+      <div class="h-stat"><strong>3</strong> surfaces kept separate</div>
+      <div class="h-stat"><strong>2 of 7</strong> slots monetized</div>
+      <div class="h-stat"><strong>9</strong> public sources</div>
+      <div class="h-stat"><strong>Smoke tested</strong> prototype</div>
+    </div>
+    <div class="hero-btns">
+      <a href="https://github.com/Muthuvisali/MicroIntent_Prototype_v0.2.1" target="_blank" rel="noopener" class="btn-hero-gh">⌥ Prototype repository</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 1. SCOPE NOTE ═══ -->
+<section class="cream scope">
+  <div class="sec-inner">
+    <div class="scope-note" role="note" aria-label="Scope note">
+      <div class="scope-ico" aria-hidden="true">ⓘ</div>
+      <div>
+        <div class="scope-label">Scope note</div>
+        <p>This is an independent portfolio study based on public information as of September 2026. It is not affiliated with Google and does not claim knowledge of Google's proprietary ranking, auction, or internal roadmap.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 2. EXECUTIVE SUMMARY ═══ -->
+<section class="light">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Executive Summary</div>
+    <h2 class="sec-title fu">The Thesis<br/><span class="ac">in One Page</span></h2>
+
+    <div class="sum-list">
+      <div class="sum-row fu">
+        <div class="t-label">Observation</div>
+        <p>AI Search is shifting user behavior from discrete queries toward longer, multi turn sessions. Google says AI Mode has passed <strong>1 billion monthly active users</strong>, its average query is about <strong>three times as long</strong> as a traditional Search query, and AI powered features are helping drive Search usage to all time highs.<a class="cite" href="#src-2">[2]</a></p>
+      </div>
+      <div class="sum-row fu delay-1">
+        <div class="t-label">Business signal</div>
+        <p>Alphabet's Q2 2026 filing shows a sharp contrast. Google Search &amp; other revenue rose from <strong>$54.2B to $63.3B</strong> year over year, while Google Network revenue slipped from <strong>$7.354B to $7.303B</strong>. Network impressions fell 12% while cost per impression rose 13%, and Alphabet cited a revenue mix shift from Network properties toward Search &amp; other properties.<a class="cite" href="#src-1">[1]</a></p>
+      </div>
+      <div class="sum-row fu delay-2">
+        <div class="t-label">Current direction</div>
+        <p>Google is already integrating ads into AI Search. Ads can appear within AI Overviews, matched against both the original query and AI generated content. In AI Mode, Google is testing Conversational Discovery ads, Highlighted Answers, AI powered Shopping ads, and expanded Direct Offers.<a class="cite" href="#src-3">[3]</a><a class="cite" href="#src-4">[4]</a></p>
+      </div>
+      <div class="sum-row fu delay-3">
+        <div class="t-label">Gap investigated</div>
+        <p>Those public products validate answer aware ad matching. This case explores a more granular layer: what if a structured AI answer is decomposed into distinct <strong>micro intents</strong>, each independently scored for commercial eligibility, while only a small number of high utility sponsored recommendations are shown?</p>
+      </div>
+      <div class="sum-row fu delay-4">
+        <div class="t-label">Product hypothesis</div>
+        <p>If conversational Search can identify commercial micro intents and selectively match clearly labeled sponsored recommendations to them, it may create higher context commercial interactions than generic query level matching, without turning the assistant into an ad catalog.</p>
+      </div>
+    </div>
+
+    <div class="callout fu">
+      <div class="callout-ttl">Core question</div>
+      <p>Can deeper conversational context create <strong>fewer, more useful, more valuable</strong> sponsored interactions without reducing trust, answer quality, or organic discovery?</p>
+    </div>
+
+    <figure class="fig fu">
+      <a class="fig-frame" href="images/microintent-concept.png" target="_blank" rel="noopener">
+        <img src="images/microintent-concept.png" width="1800" height="900" loading="lazy"
+             alt="Side by side diagram titled From Query-Level Matching to Micro-Intent Matching. Left, the current public direction: user query, then AI answer or conversation, then commercial opportunity detected, then eligible ad inventory and auction. Right, the proposed MicroIntent layer: user query plus multi turn context, then the AI answer is semantically decomposed into micro intents such as luxury, leather and travel, each given its own eligibility score, and only the selected contexts pass into the existing ranking and auction."/>
+      </a>
+      <figcaption><strong>Concept.</strong> The proposed contribution is an additional semantic decision layer between the generated answer and existing commercial eligibility and ranking systems. It does not replace organic ranking or the existing ad auction.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ═══ 3. EVIDENCE ═══ -->
+<section class="cream">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Evidence</div>
+    <h2 class="sec-title fu">What the Public Data<br/><span class="ac">Actually Supports</span></h2>
+    <p class="sec-lead fu">The case deliberately separates verified facts from hypotheses. The evidence below is the factual backbone; causal claims are intentionally conservative.</p>
+
+    <div class="tbl-wrap fu">
+      <table class="dt">
+        <thead><tr><th>Public signal</th><th>Evidence</th><th>What we can conclude</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr>
+            <td data-label="Public signal">Search growth</td>
+            <td data-label="Evidence">Q2 2026 Search &amp; other: $63.271B vs $54.190B; paid clicks +13%, CPC +3%.<a class="cite" href="#src-1">[1]</a></td>
+            <td data-label="What we can conclude">Search is not publicly showing a demand or revenue decline.</td>
+            <td data-label="Confidence"><span class="pill green">Very high</span></td>
+          </tr>
+          <tr>
+            <td data-label="Public signal">Network pressure</td>
+            <td data-label="Evidence">Q2 2026 Network: $7.303B vs $7.354B; impressions −12%, cost per impression +13%; decline primarily tied to AdSense.<a class="cite" href="#src-1">[1]</a></td>
+            <td data-label="What we can conclude">Underlying Network volume is declining even as average monetization per impression rises.</td>
+            <td data-label="Confidence"><span class="pill green">Very high</span></td>
+          </tr>
+          <tr>
+            <td data-label="Public signal">Revenue mix</td>
+            <td data-label="Evidence">Alphabet said the TAC rate declined partly because revenue mix shifted from Network properties toward Search &amp; other properties.<a class="cite" href="#src-1">[1]</a></td>
+            <td data-label="What we can conclude">The monetization mix is moving toward Google owned Search properties.</td>
+            <td data-label="Confidence"><span class="pill green">Very high</span></td>
+          </tr>
+          <tr>
+            <td data-label="Public signal">AI Search scale</td>
+            <td data-label="Evidence">AI Mode &gt;1B monthly users; queries more than doubled every quarter since launch; average AI Mode search ~3× traditional query length.<a class="cite" href="#src-2">[2]</a></td>
+            <td data-label="What we can conclude">Conversational Search is a major, scaled surface with richer intent.</td>
+            <td data-label="Confidence"><span class="pill green">Very high</span></td>
+          </tr>
+          <tr>
+            <td data-label="Public signal">AI native ads</td>
+            <td data-label="Evidence">Ads can appear inside AI Overviews; Google tests Conversational Discovery ads, Highlighted Answers, Direct Offers and AI Shopping ads.<a class="cite" href="#src-3">[3]</a><a class="cite" href="#src-4">[4]</a></td>
+            <td data-label="What we can conclude">The problem is not "put ads in AI Search". Google is already doing that.</td>
+            <td data-label="Confidence"><span class="pill green">Very high</span></td>
+          </tr>
+          <tr>
+            <td data-label="Public signal">Publisher pressure</td>
+            <td data-label="Evidence">Reuters Institute / Chartbeat: organic Google Search referrals to 2,500+ sites fell ~33% globally and ~38% in the U.S. from Nov 2024 to Nov 2025; causality from AI Overviews is uncertain.<a class="cite" href="#src-7">[7]</a></td>
+            <td data-label="What we can conclude">Publisher referral pressure is real, but AI should not be presented as the sole cause.</td>
+            <td data-label="Confidence"><span class="pill gold">High</span></td>
+          </tr>
+          <tr>
+            <td data-label="Public signal">Ecosystem response</td>
+            <td data-label="Evidence">Google launched dedicated generative AI visibility reporting in Search Console.<a class="cite" href="#src-6">[6]</a></td>
+            <td data-label="What we can conclude">Publisher visibility and attribution are explicit product concerns.</td>
+            <td data-label="Confidence"><span class="pill green">Very high</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="not-claim fu">
+      <div class="t-label">What this does not claim</div>
+      <ul>
+        <li>That AI Mode caused the Network impression decline.</li>
+        <li>That Google has not internally explored micro intent systems.</li>
+        <li>That a revenue lift can be estimated from public data alone.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 4. PROBLEM DEFINITION ═══ -->
+<section class="light">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Problem Definition</div>
+    <h2 class="sec-title fu">The Unit of Behavior<br/><span class="ac">Is Changing</span></h2>
+    <p class="sec-lead fu">Traditional Search monetization is naturally organized around discrete queries. AI Search increasingly behaves like a session: the user starts broad, refines constraints, compares options, and may complete a decision without leaving the conversation.</p>
+
+    <div class="model-shift fu">
+      <div class="model-card">
+        <div class="t-label">Query centric model</div>
+        <div class="model-flow">Query → intent → ad eligibility → ranking / auction</div>
+      </div>
+      <div class="model-arrow" aria-hidden="true">→</div>
+      <div class="model-card new">
+        <div class="t-label">Conversational model</div>
+        <div class="model-flow">Conversation → answer structure → micro intents → selected commercial moments</div>
+      </div>
+    </div>
+
+    <h3 class="sub-hd fu">The behavior that triggered the research</h3>
+    <p class="body-p fu">The starting observation was personal but testable: in AI Mode, a user can often complete discovery inside the answer and follow up box rather than opening multiple source pages.</p>
+    <figure class="fig fu">
+      <a class="fig-frame" href="images/microintent-ai-mode-observation.png" target="_blank" rel="noopener">
+        <img src="images/microintent-ai-mode-observation.png" width="1610" height="710" loading="lazy"
+             alt="Screenshot of a Google AI Mode result for the query women sling bags. The answer lists top recommendations, including the Quince Sloane Handwoven Sling Bag as best overall leather at around $94 and the BÉIS Sport Sling as best sporty and athletic option at around $58. A panel on the right, outlined in red, shows organic source cards from Travel + Leisure, The Sak, and a YouTube video from Pack Hacker."/>
+      </a>
+      <figcaption><strong>Observation.</strong> The source cards shown in AI Mode are not automatically "AdSense impressions". Organic source visibility, free product listings, and paid sponsored placements are economically distinct.</figcaption>
+    </figure>
+
+    <div class="tbl-wrap fu">
+      <table class="dt">
+        <thead><tr><th>Surface</th><th>Example</th><th>Direct revenue from appearance?</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Surface">Organic AI / Search source</td><td data-label="Example">Publisher link or brand website surfaced as a source</td><td data-label="Direct revenue from appearance?">No automatic ad revenue</td></tr>
+          <tr><td data-label="Surface">Free merchant listing</td><td data-label="Example">Eligible Merchant Center product shown organically</td><td data-label="Direct revenue from appearance?">No payment required simply for appearing</td></tr>
+          <tr><td data-label="Surface">Sponsored placement</td><td data-label="Example">Clearly labeled ad, retailer, or offer</td><td data-label="Direct revenue from appearance?">Potential advertising revenue</td></tr>
+          <tr><td data-label="Surface">Google Network impression</td><td data-label="Example">Google served ad on a partner site or app using AdSense, AdMob or Ad Manager</td><td data-label="Direct revenue from appearance?">Network advertising revenue<a class="cite" href="#src-1">[1]</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-hd fu">Definition: micro intent</h3>
+    <div class="callout fu">
+      <p><strong>Micro intent:</strong> a semantically distinct need contained inside a larger AI request or answer that can represent an independent decision or next step.</p>
+    </div>
+
+    <div class="tension-grid">
+      <div class="tension-card fu">
+        <div class="t-label">Example 01 · Sequential</div>
+        <h4>10 step Korean skincare</h4>
+        <p>Oil cleanse · water cleanse · toner · essence · serum · moisturizer · SPF</p>
+      </div>
+      <div class="tension-card fu delay-1">
+        <div class="t-label">Example 02 · Categorical</div>
+        <h4>Women's sling bags</h4>
+        <p>Luxury · genuine leather · faux leather · travel · sport</p>
+      </div>
+      <div class="tension-card fu delay-2">
+        <div class="t-label">Example 03 · Planning</div>
+        <h4>Plan a Japan trip</h4>
+        <p>Flight · hotel · rail · activities · connectivity · dining</p>
+      </div>
+    </div>
+
+    <div class="hard-rule fu">
+      <span aria-hidden="true">💡</span>
+      <div><strong>Product hypothesis.</strong> If high commercial intent micro intents are identified and matched to clearly labeled sponsored recommendations, then contextual usefulness and advertiser value may improve relative to a generic conversational placement, provided ad density, trust, safety and organic discovery stay within guardrails.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 5. STAKEHOLDERS & TRADEOFFS ═══ -->
+<section class="cream">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Stakeholders &amp; Tradeoffs</div>
+    <h2 class="sec-title fu">A Four Sided System,<br/><span class="ac">Not a One Sided Ad Feature</span></h2>
+
+    <figure class="fig fu">
+      <a class="fig-frame" href="images/microintent-stakeholders.png" target="_blank" rel="noopener">
+        <img src="images/microintent-stakeholders.png" width="1500" height="900" loading="lazy"
+             alt="Diagram titled Four-Sided Value System, with the AI Search platform at the center and two way arrows to four parties: the user, who wants useful answers, confidence and low clutter; the advertiser, who wants qualified demand, ROAS and insight; the publisher or creator, who wants discovery, traffic and attribution; and trust and safety, covering transparency, policy and privacy. Subtitle: a monetization feature ships only if incremental commercial value exceeds UX, trust, and ecosystem cost."/>
+      </a>
+    </figure>
+
+    <div class="tbl-wrap fu">
+      <table class="dt">
+        <thead><tr><th>Stakeholder</th><th>Job to be done</th><th>Opportunity</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Stakeholder">User</td><td data-label="Job to be done">Reach a confident decision quickly</td><td data-label="Opportunity">Less work translating AI guidance into an actionable option</td><td data-label="Risk">Clutter; reduced trust; blurred organic and sponsored line</td></tr>
+          <tr><td data-label="Stakeholder">Advertiser</td><td data-label="Job to be done">Reach qualified demand efficiently</td><td data-label="Opportunity">Richer declared context can improve matching and insight</td><td data-label="Risk">Opaque AI matching; reduced control</td></tr>
+          <tr><td data-label="Stakeholder">Platform</td><td data-label="Job to be done">Sustain Search usefulness and economics</td><td data-label="Opportunity">New high context inventory and better commercial relevance</td><td data-label="Risk">Short term monetization can damage long term trust</td></tr>
+          <tr><td data-label="Stakeholder">Publisher / creator</td><td data-label="Job to be done">Receive discovery, audience value and attribution</td><td data-label="Opportunity">Potential attribution or new value sharing surfaces</td><td data-label="Risk">Further reduction in outbound traffic</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout fu">
+      <div class="callout-ttl">Decision principle</div>
+      <p>Incremental commercial value must exceed <strong>UX cost + trust cost + ecosystem cost</strong>. CTR alone is not enough.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 6. EXPERIENCE DESIGN ═══ -->
+<section class="light">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Experience Design</div>
+    <h2 class="sec-title fu">Two Patterns: Sequential<br/><span class="ac">and Categorical Micro Intents</span></h2>
+
+    <h3 class="sub-hd fu">A. Sequential: Korean skincare routine</h3>
+    <p class="body-p fu">A single request can produce a structured routine. The system scores each step but does not turn every step into an ad slot. A 7 to 10 step response may still contain only one to three sponsored units.</p>
+    <p class="body-p fu">The table below is the prototype's actual decision trace for <em>"Build me a Korean skincare routine for dry skin under $120"</em>. Every step clears the eligibility bar, so the choice comes down to placement priority (commercial intent × ad quality), the per-answer cap, and a rule that no advertiser holds two slots in the same answer.</p>
+
+    <div class="tbl-wrap fu">
+      <table class="dt">
+        <thead><tr><th>Answer component</th><th>Commercial score</th><th>Eligible?</th><th>Placement decision</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Answer component">Sunscreen</td><td data-label="Commercial score">.91</td><td data-label="Eligible?">Yes</td><td data-label="Placement decision"><span class="pill gold">Sponsored</span> highest placement priority</td></tr>
+          <tr><td data-label="Answer component">Oil cleanser</td><td data-label="Commercial score">.88</td><td data-label="Eligible?">Yes</td><td data-label="Placement decision"><span class="pill gold">Sponsored</span> second slot</td></tr>
+          <tr><td data-label="Answer component">Serum</td><td data-label="Commercial score">.84</td><td data-label="Eligible?">Yes</td><td data-label="Placement decision"><span class="pill plum">No</span> saturation cap reached</td></tr>
+          <tr><td data-label="Answer component">Moisturizer</td><td data-label="Commercial score">.82</td><td data-label="Eligible?">Yes</td><td data-label="Placement decision"><span class="pill plum">No</span> diversity rule: same advertiser as the oil cleanser</td></tr>
+          <tr><td data-label="Answer component">Water cleanser</td><td data-label="Commercial score">.79</td><td data-label="Eligible?">Yes</td><td data-label="Placement decision"><span class="pill plum">No</span> saturation cap reached</td></tr>
+          <tr><td data-label="Answer component">Essence</td><td data-label="Commercial score">.71</td><td data-label="Eligible?">Yes</td><td data-label="Placement decision"><span class="pill plum">No</span> diversity rule: same advertiser as the sunscreen</td></tr>
+          <tr><td data-label="Answer component">Toner</td><td data-label="Commercial score">.67</td><td data-label="Eligible?">Yes</td><td data-label="Placement decision"><span class="pill plum">No</span> saturation; optional step, lowest intent</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note fu">Being eligible is not the same as being shown. The prototype caps sponsored units at two per answer by default (configurable from one to three), so this seven step routine monetizes two of its seven slots. Every step still shows organic options.</p>
+
+    <h3 class="sub-hd fu">B. Categorical: sling bags</h3>
+    <p class="body-p fu">The same logic generalizes to categorical answers: luxury, leather, faux leather, travel and sport can each be independently scored. The product is the placement logic, not a one off skincare UI. Each answer keeps three surfaces structurally separate:</p>
+    <div class="surface-row">
+      <div class="surface fu">
+        <h4>AI guidance</h4>
+        <p>What to look for in each category.</p>
+      </div>
+      <div class="surface fu delay-1">
+        <h4>Organic options</h4>
+        <p>Non sponsored options ranked only on relevance, constraint fit and quality. Bid is never an input, and the sponsored product is never repeated here.</p>
+      </div>
+      <div class="surface sp fu delay-2">
+        <h4>Sponsored match <span class="pill gold">Sponsored</span></h4>
+        <p>Clearly labeled; selected because it satisfies the current micro intent and explicit session constraints.</p>
+      </div>
+    </div>
+    <p class="note fu">In the prototype, asking for leather and travel options under $100 shows the tension the separation is built for. In the travel section the top organic option is a black travel sling that fits a Kindle, while the sponsored slot goes to a higher bidding crossbody. The paid unit sits beside the best organic answer instead of replacing it. A third pattern, planning a Japan trip, runs through the same logic: six components, two sponsored slots.</p>
+  </div>
+</section>
+
+<!-- ═══ 7. PRODUCT PRINCIPLES ═══ -->
+<section class="dark">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Product Principles</div>
+    <h2 class="sec-title fu">The Strongest Feature May Be<br/><span class="ac-gold">Knowing When Not to Monetize</span></h2>
+    <p class="sec-lead fu">A commercially plausible block is not automatically a sponsored slot. These principles constrain every downstream decision in the system.</p>
+
+    <div class="gov-grid">
+      <div class="gc fu"><div class="gc-n">1</div><div><div class="gc-ttl">Scarcity by design</div><div class="gc-desc">A commercially plausible block is not automatically a sponsored slot. High precision is preferred to high recall.</div></div></div>
+      <div class="gc fu delay-1"><div class="gc-n">2</div><div><div class="gc-ttl">Explicit current session context first</div><div class="gc-desc">The MVP uses preferences the user states in the current conversation; it does not require historical profiling.</div></div></div>
+      <div class="gc fu delay-2"><div class="gc-n">3</div><div><div class="gc-ttl">Organic and sponsored stay distinct</div><div class="gc-desc">A paid unit must not silently become the assistant's "best" recommendation.</div></div></div>
+      <div class="gc fu delay-3"><div class="gc-n">4</div><div><div class="gc-ttl">Safety before auction</div><div class="gc-desc">Sensitive context is filtered before candidate retrieval, not after an advertiser wins.</div></div></div>
+      <div class="gc fu delay-4"><div class="gc-n">5</div><div><div class="gc-ttl">Ground every explanation</div><div class="gc-desc">"Why this matches" can only reference user stated constraints and product catalog facts.</div></div></div>
+      <div class="gc fu delay-5"><div class="gc-n">6</div><div><div class="gc-ttl">Graceful failure</div><div class="gc-desc">If monetization services fail, the base AI answer still works.</div></div></div>
+    </div>
+
+    <h3 class="sub-hd fu">Reasons not to build this</h3>
+    <div class="tbl-wrap fu">
+      <table class="dt">
+        <thead><tr><th>Objection</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Objection">Trust erosion</td><td data-label="Why it matters">Users may no longer know whether the assistant recommends something because it is useful or because it is sponsored.</td></tr>
+          <tr><td data-label="Objection">Ad overload</td><td data-label="Why it matters">Structured answers create many potential slots; monetizing them all would degrade the product.</td></tr>
+          <tr><td data-label="Objection">Existing formats may be sufficient</td><td data-label="Why it matters">Highlighted Answers and current AI native formats may capture most of the value without added complexity.<a class="cite" href="#src-4">[4]</a></td></tr>
+          <tr><td data-label="Objection">Publisher displacement</td><td data-label="Why it matters">Capturing more value inside Search may weaken outbound discovery to source sites.</td></tr>
+          <tr><td data-label="Objection">Latency / complexity</td><td data-label="Why it matters">Semantic segmentation, safety, retrieval, ranking and explanation add system work.</td></tr>
+          <tr><td data-label="Objection">Gaming</td><td data-label="Why it matters">Merchants may optimize product metadata for micro intent eligibility in low quality ways.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 8. SYSTEM ARCHITECTURE ═══ -->
+<section class="light">
+  <div class="sec-inner">
+    <div class="sec-tag fu">System Architecture</div>
+    <h2 class="sec-title fu">A Buildable System With<br/><span class="ac">Inspectable Decisions</span></h2>
+    <p class="sec-lead fu">The implementation intentionally separates LLM interpretation from commercial ranking so downstream decisions can be tested and audited.</p>
+
+    <figure class="fig fu">
+      <a class="fig-frame" href="images/microintent-architecture.png" target="_blank" rel="noopener">
+        <img src="images/microintent-architecture.png" width="1800" height="1150" loading="lazy"
+             alt="Diagram titled MicroIntent MVP End-to-End Architecture, labeled as a conceptual prototype and not a representation of Google's proprietary systems. Row one: user, search like prototype UI, conversation context manager, LLM answer generator. Row two: micro intent extractor, safety and policy gate, commercial intent scoring, candidate retrieval with Postgres and pgvector. Row three: relevance and auction ranking, ad saturation controller, grounded why this matches generator, and a response composer that returns organic and sponsored results to the UI. Every stage reports into a telemetry and evaluation harness."/>
+      </a>
+      <figcaption><strong>Conceptual MVP architecture.</strong> Not a representation of Google's proprietary systems. In the current prototype, answer text is templated and retrieval runs over a JSON catalog; Postgres + pgvector is the next iteration.</figcaption>
+    </figure>
+
+    <div class="comp-grid">
+      <div class="comp fu"><div class="comp-n">1</div><div><div class="comp-ttl">Context manager</div><div class="comp-desc">Accumulates only explicit in session constraints for the MVP.</div></div></div>
+      <div class="comp fu delay-1"><div class="comp-n">2</div><div><div class="comp-ttl">Micro intent extractor</div><div class="comp-desc">Produces structured JSON. The LLM interprets intent but does not directly choose the winning advertisement.</div></div></div>
+      <div class="comp fu delay-2"><div class="comp-n g">3</div><div><div class="comp-ttl">Safety gate</div><div class="comp-desc">Stops sensitive contexts before commercial retrieval.</div></div></div>
+      <div class="comp fu delay-3"><div class="comp-n">4</div><div><div class="comp-ttl">Candidate retrieval</div><div class="comp-desc">Fetches products whose category and structured attributes can satisfy the micro intent.</div></div></div>
+      <div class="comp fu delay-4"><div class="comp-n">5</div><div><div class="comp-ttl">Ranking / auction simulator</div><div class="comp-desc">Uses a transparent prototype formula. It is explicitly not Google's formula.</div></div></div>
+      <div class="comp fu delay-5"><div class="comp-n g">6</div><div><div class="comp-ttl">Saturation controller</div><div class="comp-desc">Caps ad density, allows one slot per advertiser per answer, and records which rule rejected each eligible slot.</div></div></div>
+      <div class="comp fu"><div class="comp-n">7</div><div><div class="comp-ttl">Explanation generator</div><div class="comp-desc">Produces grounded match reasons from structured facts.</div></div></div>
+      <div class="comp fu delay-1"><div class="comp-n">8</div><div><div class="comp-ttl">Evaluation / telemetry</div><div class="comp-desc">Records why a unit was blocked, eligible, ranked or selected.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 9. RANKING & SAFETY ═══ -->
+<section class="cream">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Ranking &amp; Safety</div>
+    <h2 class="sec-title fu">Structured Intent Before<br/><span class="ac">Commercial Decisions</span></h2>
+    <p class="sec-lead fu">Every micro intent becomes a structured object before any commercial logic runs. Monetization is held to a higher bar than answer generation.</p>
+
+    <h3 class="sub-hd fu">Example micro intent object</h3>
+<pre class="code fu" aria-label="Example micro intent JSON object">{
+  <span class="k">"label"</span>: <span class="s">"leather sling bag"</span>,
+  <span class="k">"commercial_score"</span>: <span class="n">0.92</span>,
+  <span class="k">"constraints"</span>: {
+    <span class="k">"material"</span>: <span class="s">"leather"</span>,
+    <span class="k">"color"</span>: <span class="s">"black"</span>,
+    <span class="k">"max_price"</span>: <span class="n">100</span>,
+    <span class="k">"capacity_requirement"</span>: <span class="s">"Kindle"</span>
+  },
+  <span class="k">"sensitive_domain"</span>: <span class="n">false</span>
+}</pre>
+
+    <h3 class="sub-hd fu">Prototype ranking function</h3>
+    <p class="body-p fu">The working prototype uses an intentionally simple, inspectable score:</p>
+    <div class="formula fu">
+      <div class="formula-eq">Score = 0.40R + 0.20C + 0.15Q + 0.15B + 0.10U</div>
+      <div class="formula-legend">
+        <span><b>R</b> contextual relevance</span>
+        <span><b>C</b> constraint fit</span>
+        <span><b>Q</b> product / advertiser quality</span>
+        <span><b>B</b> normalized simulated bid</span>
+        <span><b>U</b> estimated user utility</span>
+      </div>
+    </div>
+    <div class="hard-rule fu">
+      <span aria-hidden="true">⛔</span>
+      <div><strong>Hard rule.</strong> If the best contextual score is below the minimum eligibility threshold, show no sponsored unit, even if an advertiser has a high bid.</div>
+    </div>
+
+    <h3 class="sub-hd fu">Safety decisions</h3>
+    <p class="body-p fu">Google's public Ads in AI Overviews documentation already excludes sensitive verticals such as healthcare, finance and politics from inline placements.<a class="cite" href="#src-3">[3]</a> The MVP follows the same principle: commercial eligibility is blocked before retrieval in sensitive contexts.</p>
+    <div class="tbl-wrap fu">
+      <table class="dt">
+        <thead><tr><th>Input</th><th>Policy decision</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Input">"Best black leather sling bag under $100"</td><td data-label="Policy decision">Non sensitive commercial context</td><td data-label="Outcome"><span class="pill green">Eligible for scoring</span></td></tr>
+          <tr><td data-label="Input">"Explain photosynthesis"</td><td data-label="Policy decision">Non commercial context</td><td data-label="Outcome"><span class="pill plum">No ad</span></td></tr>
+          <tr><td data-label="Input">"I have severe chest pain. What should I buy?"</td><td data-label="Policy decision">Sensitive healthcare context</td><td data-label="Outcome"><span class="pill red">Block before retrieval</span></td></tr>
+          <tr><td data-label="Input">"Which candidate should I vote for?"</td><td data-label="Policy decision">Sensitive political context</td><td data-label="Outcome"><span class="pill red">Block monetization</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-hd fu">Explanation faithfulness</h3>
+    <p class="body-p fu">If the user said "black leather under $100", the explanation may reference those constraints. It may not invent preferences ("you travel frequently") or sensitive traits that were never stated. A strong evaluator should target near perfect support for every generated match claim.</p>
+  </div>
+</section>
+
+<!-- ═══ 10. EXPERIMENT DESIGN & METRICS ═══ -->
+<section class="light">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Experiment Design &amp; Metrics</div>
+    <h2 class="sec-title fu">The Baseline Is<br/><span class="ac">Not "No Ads"</span></h2>
+    <p class="sec-lead fu">Because Google already has contextual AI advertising, the meaningful experiment compares MicroIntent placement against a strong generic conversational sponsored placement, not against an artificially weak baseline.</p>
+
+    <div class="tbl-wrap fu">
+      <table class="dt">
+        <thead><tr><th>Condition</th><th>Experience</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Condition">Control</td><td data-label="Experience">Organic AI response; no sponsored placement (diagnostic baseline).</td></tr>
+          <tr><td data-label="Condition">Variant A</td><td data-label="Experience">One highly relevant generic conversational sponsored recommendation.</td></tr>
+          <tr><td data-label="Condition">Variant B</td><td data-label="Experience">Micro intent level sponsored matching with saturation control.</td></tr>
+          <tr><td data-label="Condition">Variant C</td><td data-label="Experience">Micro intent matching plus accumulated explicit multi turn preferences.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-hd fu">Measurement framework</h3>
+    <div class="impact-grid">
+      <div class="impact-card fu">
+        <div class="impact-hd"><div class="impact-ico">🎯</div><div class="impact-ttl">Primary</div></div>
+        <ul class="impact-list">
+          <li><strong>Qualified Commercial Actions per Eligible AI Session.</strong> Stronger than raw CTR because it ties ad interactions to task completion.</li>
+        </ul>
+      </div>
+      <div class="impact-card fu delay-1">
+        <div class="impact-hd"><div class="impact-ico">🙋</div><div class="impact-ttl">User guardrails</div></div>
+        <ul class="impact-list">
+          <li>Answer satisfaction and abandonment</li>
+          <li>Follow up continuation</li>
+          <li>Hide / report rate</li>
+          <li>Perceived clarity of sponsorship</li>
+        </ul>
+      </div>
+      <div class="impact-card fu delay-2">
+        <div class="impact-hd"><div class="impact-ico">📣</div><div class="impact-ttl">Advertiser &amp; ecosystem</div></div>
+        <ul class="impact-list">
+          <li>Contextual relevance, qualified action rate, conversion proxy, simulated ROAS</li>
+          <li>Organic source CTR and organic to sponsored exposure ratio</li>
+          <li>Publisher outbound engagement</li>
+        </ul>
+      </div>
+      <div class="impact-card fu delay-3">
+        <div class="impact-hd"><div class="impact-ico">⚙️</div><div class="impact-ttl">System</div></div>
+        <ul class="impact-list">
+          <li>Intent precision and safety precision</li>
+          <li>Explanation faithfulness</li>
+          <li>Latency</li>
+          <li>Saturation policy compliance</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout fu">
+      <div class="callout-ttl">Proposed new metric: Sponsored Utility Rate (SUR)</div>
+      <p>The <strong>share of sponsored units users judge helpful to completing the task.</strong> For an assistant, usefulness is a better success signal than click through alone.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11. PROTOTYPE STATUS ═══ -->
+<section class="cream">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Prototype Status</div>
+    <h2 class="sec-title fu">What Is Built,<br/><span class="ac">and What It Proves</span></h2>
+    <p class="sec-lead fu">MicroIntent is a <strong>conceptual prototype</strong>. It runs locally against a synthetic merchant catalog and is not deployed. It shows the pipeline behaves as designed; it does not show that the idea works in market.</p>
+
+    <div class="verdict-strip fu">
+      <div class="vs-left">
+        <div class="vs-label">Status at case study handoff</div>
+        <div class="vs-decision">Smoke tested</div>
+      </div>
+      <div class="vs-divider"></div>
+      <div class="vs-stat">
+        <div class="vs-num">15 / 15</div>
+        <div class="vs-desc">Automated tests passing</div>
+      </div>
+      <div class="vs-divider"></div>
+      <div class="vs-stat">
+        <div class="vs-num">13 / 13</div>
+        <div class="vs-desc">Evaluation cases behaving as expected</div>
+      </div>
+    </div>
+    <p class="note fu" style="margin-bottom:36px;">This is a smoke test, not a benchmark. Thirteen cases confirm expected ad count and safety behavior across commercial, non commercial and sensitive (health, fertility, political) inputs; they say nothing about relevance quality or user value at scale.</p>
+
+    <div class="impact-grid">
+      <div class="impact-card fu">
+        <div class="impact-hd"><div class="impact-ico">🧱</div><div class="impact-ttl">Implemented</div></div>
+        <ul class="impact-list">
+          <li><strong>FastAPI service</strong> with a functional chat endpoint and a lightweight browser demo</li>
+          <li><strong>Pydantic schemas</strong> for sessions, micro intents, candidates, sponsored placements and decision traces</li>
+          <li><strong>Two micro intent extractors</strong> behind one schema: Gemini structured output when an API key is configured, and a deterministic engine that needs no key. Every fallback is recorded in the trace</li>
+          <li><strong>Multi turn session context</strong> that accumulates only preferences the user states explicitly</li>
+          <li><strong>Synthetic merchant catalog</strong> of 36 fictional skincare, bag and Japan trip products from competing advertisers, avoiding live advertiser data</li>
+          <li><strong>Safety gate</strong> blocking representative healthcare, fertility and political contexts before retrieval</li>
+          <li><strong>Three separate surfaces</strong> per answer section: AI guidance, bid free organic options, and at most one labeled sponsored match</li>
+          <li><strong>Ranking and saturation</strong> simulator with a hard score threshold, a configurable cap and a one slot per advertiser rule</li>
+          <li><strong>Graceful failure:</strong> if the ad system errors, the organic answer still ships and the trace reports it</li>
+          <li><strong>Decision trace</strong> with a per component outcome: blocked, not commercial, below threshold, selected, or rejected by the cap or the diversity rule</li>
+          <li><strong>Strategy comparison</strong> of a single query level sponsored result against MicroIntent placements for any conversation</li>
+        </ul>
+      </div>
+      <div class="impact-card fu delay-1">
+        <div class="impact-hd"><div class="impact-ico">🔭</div><div class="impact-ttl">Next engineering iteration</div></div>
+        <ul class="impact-list">
+          <li>Measure Gemini extraction against the deterministic baseline on a human labeled set</li>
+          <li>Add Postgres + pgvector retrieval and persistent telemetry</li>
+          <li>Grow the evaluation set to 150 to 250 conversations with hard negatives and human labels</li>
+          <li>Turn the per query strategy comparison into a batch evaluator reporting safety precision, explanation faithfulness and saturation compliance</li>
+          <li>Allocate a stated budget across a multi item plan; today a trip budget is checked against each item separately</li>
+          <li>Build an advertiser facing intent insights view only after the core consumer hypothesis is validated</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12. SOURCES ═══ -->
+<section class="light" id="sources">
+  <div class="sec-inner">
+    <div class="sec-tag fu">Sources</div>
+    <h2 class="sec-title fu">Primary Research<br/><span class="ac">References</span></h2>
+    <p class="sec-lead fu">Product claims about Google are limited to publicly documented behavior. Proposed architecture, metrics, schemas and ranking logic are independent concept design.</p>
+    <ol class="src-list">
+      <li id="src-1"><div>Alphabet Inc. Form 10-Q, quarter ended June 30, 2026. <a href="https://www.sec.gov/Archives/edgar/data/1652044/000165204426000071/goog-20260630.htm" target="_blank" rel="noopener">sec.gov ↗</a></div></li>
+      <li id="src-2"><div>Google, "How AI Mode is changing and expanding the way people search in the U.S." (May 19, 2026). <a href="https://blog.google/products-and-platforms/products/search/ai-mode-us-insights/" target="_blank" rel="noopener">blog.google ↗</a></div></li>
+      <li id="src-3"><div>Google Ads Help, "About ads and AI Overviews". <a href="https://support.google.com/google-ads/answer/16297775?hl=en" target="_blank" rel="noopener">support.google.com ↗</a></div></li>
+      <li id="src-4"><div>Google, "A new generation of ads for the AI era of Search" (May 20, 2026). <a href="https://blog.google/products/ads-commerce/google-marketing-live-search-ads/" target="_blank" rel="noopener">blog.google ↗</a></div></li>
+      <li id="src-5"><div>Google, "What's ahead for commercial experiences in 2026". <a href="https://blog.google/products/ads-commerce/digital-advertising-commerce-2026/" target="_blank" rel="noopener">blog.google ↗</a></div></li>
+      <li id="src-6"><div>Google Search Central, "Introducing Search Generative AI performance reports in Search Console" (June 3, 2026). <a href="https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports" target="_blank" rel="noopener">developers.google.com ↗</a></div></li>
+      <li id="src-7"><div>Reuters Institute, "Journalism, media, and technology trends and predictions 2026". <a href="https://reutersinstitute.politics.ox.ac.uk/journalism-media-and-technology-trends-and-predictions-2026" target="_blank" rel="noopener">reutersinstitute.politics.ox.ac.uk ↗</a></div></li>
+      <li id="src-8"><div>Google, "New opportunities, control and insights for website owners" (June 3, 2026). <a href="https://blog.google/products-and-platforms/products/search/new-controls-website-owners/" target="_blank" rel="noopener">blog.google ↗</a></div></li>
+      <li id="src-9"><div>Google, "New tech and tools for retailers to succeed in an agentic shopping era". <a href="https://blog.google/products/ads-commerce/agentic-commerce-ai-tools-protocol-retailers-platforms/" target="_blank" rel="noopener">blog.google ↗</a></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section id="cta">
+  <div class="cta-inner">
+    <h2 class="cta-ttl fu">Explore the Prototype</h2>
+    <p class="cta-sub fu">FastAPI service, structured schemas, safety gate, organic and sponsored surfaces, ranking and saturation logic, decision traces, tests and a small evaluation harness. Runs locally; nothing is deployed.</p>
+    <div class="cta-btns fu">
+      <a href="index.html#projects" class="btn-case-study">← Back to Projects</a>
+      <a href="https://github.com/Muthuvisali/MicroIntent_Prototype_v0.2.1" target="_blank" rel="noopener" class="btn-hero-gh">⌥ Prototype repository</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="index.html">← Back to Portfolio</a> &nbsp;·&nbsp;
+    Muthuvisali Ravichandra Bose &nbsp;·&nbsp; Product Manager &amp; AI Builder
+  </p>
+</footer>
+
+<script>
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    document.getElementById('scrollBar').style.width = pct + '%';
+  });
+
+  // Scroll-in animation
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fu').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
