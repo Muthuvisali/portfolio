@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Artifact — Multi-Agent Supply Chain Finance Platform</title>
+  <meta name="description" content="PM/FDE product artifact: problem, decisions, evaluation, architecture, reusable assets, deployment readiness and outcomes for the Multi-Agent Supply Chain Finance Platform."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #F5EDE8; --bg-alt: #EDD9CF;
+      --text: #2D1B35; --text-2: #3D2645; --text-3: #6B3D5A; --muted: #C4A8B8;
+      --p50:#FBF5F8; --p100:#F5E8EF; --p200:#E8C4D4; --p300:#D4A0BE;
+      --p400:#A87898; --p500:#8B4F7A; --p600:#6B3D5A; --p700:#3D2645;
+      --p800:#2D1B35; --p900:#1A0F20;
+      --gold:#C4956A; --gold-h:#A87858;
+      --border:rgba(232,196,212,0.45); --border-h:rgba(107,61,90,0.5);
+      --sh-sm:0 2px 8px rgba(45,27,53,0.07);
+      --sh-md:0 8px 30px rgba(45,27,53,0.11);
+      --pm: #6B8FA8; --pm-bg: rgba(107,143,168,0.1); --pm-bd: rgba(107,143,168,0.3);
+      --fde: #7A9B6E; --fde-bg: rgba(122,155,110,0.1); --fde-bd: rgba(122,155,110,0.3);
+      --both-bg: rgba(196,149,106,0.1); --both-bd: rgba(196,149,106,0.32);
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+    a{color:inherit;}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 5%;background:rgba(26,15,32,0.94);backdrop-filter:blur(24px) saturate(160%);border-bottom:1px solid rgba(232,196,212,.1);}
+    .nav-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:66px;gap:16px;flex-wrap:wrap;}
+    .nav-logo{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;letter-spacing:-.02em;flex-shrink:0;}
+    .nav-logo span{background:linear-gradient(135deg,var(--gold),#E8C4D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .nav-links{display:flex;align-items:center;gap:10px;}
+    .nav-back{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.65);font-size:.78rem;font-weight:600;text-decoration:none;letter-spacing:.03em;padding:7px 14px;border-radius:100px;border:1px solid rgba(255,255,255,.15);transition:all .25s ease;white-space:nowrap;}
+    .nav-back:hover{color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);}
+
+    main{max-width:840px;margin:0 auto;padding:130px 5% 100px;}
+
+    /* HEADER BLOCK */
+    .doc-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(196,149,106,.12);border:1px solid rgba(196,149,106,.3);padding:6px 16px;border-radius:100px;font-size:.68rem;color:var(--gold-h);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:22px;}
+    .doc-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);margin-bottom:14px;}
+    .doc-sub{font-size:.95rem;color:var(--text-3);line-height:1.75;max-width:640px;margin-bottom:28px;}
+    .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:44px;}
+    .meta-chip{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:100px;padding:8px 16px;font-size:.78rem;font-weight:600;color:var(--text-2);}
+    .meta-chip a{text-decoration:none;font-weight:700;color:var(--p600);}
+    .meta-chip a:hover{color:var(--gold-h);}
+    .meta-chip .lbl{color:var(--muted);font-weight:700;text-transform:uppercase;font-size:.64rem;letter-spacing:.08em;}
+
+    /* ROLE LEGEND */
+    .legend{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:56px;}
+    .legend-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:4px;}
+    .tag{display:inline-flex;align-items:center;font-size:.7rem;font-weight:700;padding:4px 11px;border-radius:100px;letter-spacing:.02em;white-space:nowrap;}
+    .tag.pm{background:var(--pm-bg);border:1px solid var(--pm-bd);color:var(--pm);}
+    .tag.fde{background:var(--fde-bg);border:1px solid var(--fde-bd);color:var(--fde);}
+    .tag.both{background:var(--both-bg);border:1px solid var(--both-bd);color:var(--gold-h);}
+
+    /* DOC SECTIONS */
+    .doc-section{margin-bottom:52px;}
+    .doc-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:14px;}
+    .doc-hd-left{display:flex;align-items:center;gap:12px;}
+    .doc-num{font-family:'Space Grotesk',sans-serif;font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:.1em;}
+    .doc-ttl{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+    .doc-tags{display:flex;gap:6px;flex-wrap:wrap;}
+
+    .card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:24px 26px;margin-bottom:16px;}
+    .card:last-child{margin-bottom:0;}
+    .card h4{font-family:'Space Grotesk',sans-serif;font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:10px;}
+    .card p{font-size:.87rem;color:var(--text-3);line-height:1.75;margin-bottom:10px;}
+    .card p:last-child{margin-bottom:0;}
+    .blist{list-style:none;display:flex;flex-direction:column;gap:9px;}
+    .blist li{font-size:.87rem;color:var(--text-3);line-height:1.65;padding-left:16px;position:relative;}
+    .blist li::before{content:'›';position:absolute;left:0;color:var(--p400);font-weight:700;}
+
+    /* TRADEOFF ROWS */
+    .tradeoff{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;}
+    .tradeoff:last-child{margin-bottom:0;}
+    .to-col{padding:18px 20px;}
+    .to-col.decision{background:var(--p50);border-right:1px solid var(--border);}
+    .to-col.why{background:#fff;}
+    .to-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;}
+    .to-col.decision .to-lbl{color:var(--p600);}
+    .to-txt{font-size:.85rem;color:var(--text-2);line-height:1.6;font-weight:600;}
+    .to-col.why .to-txt{color:var(--text-3);font-weight:400;}
+
+    /* HONEST CAVEAT CALLOUT */
+    .caveat{background:linear-gradient(135deg,var(--p900) 0%,var(--p700) 100%);border-radius:18px;padding:22px 26px;margin-top:4px;}
+    .caveat-lbl{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+    .caveat p{font-size:.85rem;color:rgba(255,255,255,.7);line-height:1.75;margin:0;}
+    .caveat strong{color:#fff;}
+
+    /* METRICS */
+    .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
+    .metric-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;}
+    .metric-num{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:800;color:var(--p700);margin-bottom:4px;}
+    .metric-lbl{font-size:.72rem;color:var(--muted);font-weight:600;line-height:1.4;}
+    .source-note{font-size:.72rem;color:var(--muted);font-style:italic;margin-top:8px;}
+
+    /* CODE / MONO */
+    .mono-block{background:var(--p900);border-radius:14px;padding:18px 22px;font-family:'JetBrains Mono',monospace;font-size:.76rem;color:rgba(255,255,255,.75);line-height:1.9;overflow-x:auto;}
+    .mono-block .rule{color:#93c5fd;}
+    .mono-block .out{color:#4ade80;font-weight:600;}
+
+    /* FOOTER */
+    footer{background:var(--p900);border-top:1px solid rgba(255,255,255,.06);padding:24px 5%;text-align:center;}
+    footer p{font-size:.8rem;color:rgba(255,255,255,.3);}
+    footer a{color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s ease;}
+    footer a:hover{color:#fff;}
+
+    @media(max-width:640px){
+      .metric-grid{grid-template-columns:1fr 1fr;}
+      .tradeoff{grid-template-columns:1fr;}
+      .to-col.decision{border-right:none;border-bottom:1px solid var(--border);}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">MRB<span>.</span></a>
+    <div class="nav-links">
+      <a href="supply-chain-finance.html" class="nav-back">← Project Page</a>
+      <a href="index.html#projects" class="nav-back">Portfolio</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <div class="doc-eyebrow">📄 Product Artifact · PM &amp; FDE Review</div>
+  <h1 class="doc-title">Multi-Agent Supply Chain Finance Optimization Platform</h1>
+  <p class="doc-sub">A structured product artifact covering the problem, product decisions, evaluation approach, architecture, reusable assets, deployment readiness and outcomes — written for Product Manager and Forward-Deployed Engineer review.</p>
+
+  <div class="meta-row">
+    <div class="meta-chip"><span class="lbl">Live Demo</span>&nbsp;<a href="https://huggingface.co/spaces/visaliravi/multi-agent-scf-platform" target="_blank" rel="noopener">HF Spaces ↗</a></div>
+    <div class="meta-chip"><span class="lbl">Code</span>&nbsp;<a href="https://github.com/Muthuvisali/multi-agent-scf-platform" target="_blank" rel="noopener">GitHub ↗</a></div>
+    <div class="meta-chip"><span class="lbl">Built</span>&nbsp;June 2026</div>
+    <div class="meta-chip"><span class="lbl">Author</span>&nbsp;Muthuvisali Ravichandra Bose</div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-lbl">Role key</span>
+    <span class="tag pm">PM</span>
+    <span class="tag fde">FDE</span>
+    <span class="tag both">BOTH</span>
+    <span style="font-size:.78rem;color:var(--text-3);margin-left:4px;">— which lens each section is written for</span>
+  </div>
+
+  <!-- 1. PROBLEM & USER -->
+  <div class="doc-section">
+    <div class="doc-hd">
+      <div class="doc-hd-left"><span class="doc-num">01</span><span class="doc-ttl">Problem &amp; User</span></div>
+      <div class="doc-tags"><span class="tag pm">PM</span></div>
+    </div>
+    <div class="card">
+      <h4>Who the user is</h4>
+      <p>Treasury and supply chain finance (SCF) operators at large enterprises — the people who decide, invoice by invoice, whether to pay a supplier on standard terms, push them into an SCF program, or pay early. Their manager is a CFO who needs the aggregate of those decisions to be fast, policy-compliant, and auditable on demand.</p>
+      <h4>Why it matters now</h4>
+      <p>This is grounded in a real deployment: Honeywell partnered with JPMorgan on a <strong>$900M+ SCF program across 260+ suppliers in 7 currencies</strong>. At that scale, three tensions show up every day:</p>
+      <ul class="blist">
+        <li><strong>Speed vs. compliance</strong> — manual review is slow and error-prone; static rule engines can't reason about nuanced supplier risk.</li>
+        <li><strong>Autonomy vs. control</strong> — decisions need to move fast, but a high-risk call slipping through without policy validation is a real financial exposure.</li>
+        <li><strong>Scale</strong> — thousands of invoices, each with a different supplier risk profile, currency, and contract term.</li>
+      </ul>
+      <h4>Job to be done</h4>
+      <p>Turn an incoming invoice into a payment-term decision — in seconds, with a defensible reasoning trail — without the treasury team hand-reviewing every case.</p>
+    </div>
+  </div>
+
+  <!-- 2. PRODUCT DECISIONS & TRADEOFFS -->
+  <div class="doc-section">
+    <div class="doc-hd">
+      <div class="doc-hd-left"><span class="doc-num">02</span><span class="doc-ttl">Product Decisions &amp; Tradeoffs</span></div>
+      <div class="doc-tags"><span class="tag pm">PM primary</span><span class="tag fde">FDE secondary</span></div>
+    </div>
+
+    <div class="tradeoff">
+      <div class="to-col decision"><div class="to-lbl">Decision</div><div class="to-txt">Six narrow, single-purpose agents instead of one large "do everything" prompt.</div></div>
+      <div class="to-col why"><div class="to-lbl">Why / tradeoff</div><div class="to-txt">Traded implementation simplicity for auditability — in a compliance-sensitive domain, being able to point to exactly which agent produced which judgment (and at what confidence) matters more than a single elegant call.</div></div>
+    </div>
+
+    <div class="tradeoff">
+      <div class="to-col decision"><div class="to-lbl">Decision</div><div class="to-txt">A deterministic, rule-based governance layer sits <em>on top of</em> the LLM agents rather than trusting the model's own judgment end-to-end.</div></div>
+      <div class="to-col why"><div class="to-lbl">Why / tradeoff</div><div class="to-txt">Traded flexibility for defensibility. Hard IF/THEN policy rules (confidence &gt;80%, risk/method alignment, escalation thresholds) are boring, inspectable, and easy to explain to a compliance reviewer — unlike "the model decided."</div></div>
+    </div>
+
+    <div class="tradeoff">
+      <div class="to-col decision"><div class="to-lbl">Decision</div><div class="to-txt">Confidence-gated auto-approval (&gt;80% threshold) with explicit escalation triggers (&gt;$5M or risk &gt;75), instead of always auto-approving.</div></div>
+      <div class="to-col why"><div class="to-lbl">Why / tradeoff</div><div class="to-txt">Traded throughput for safety. Mirrors how real treasury escalation to a CFO actually works, so the automation earns trust incrementally rather than asking for blind faith.</div></div>
+    </div>
+
+    <div class="tradeoff">
+      <div class="to-col decision"><div class="to-lbl">Decision</div><div class="to-txt">Ship one fully worked case study (a $2.5M invoice) as the flagship demo, rather than building a large synthetic invoice dataset first.</div></div>
+      <div class="to-col why"><div class="to-lbl">Why / tradeoff</div><div class="to-txt">Traded statistical breadth for narrative clarity within a limited build window — the goal was to prove the reasoning pattern works end-to-end, not to establish population-level accuracy yet.</div></div>
+    </div>
+  </div>
+
+  <!-- 3. EVALUATION & QUALITY -->
+  <div class="doc-section">
+    <div class="doc-hd">
+      <div class="doc-hd-left"><span class="doc-num">03</span><span class="doc-ttl">Evaluation &amp; Quality</span></div>
+      <div class="doc-tags"><span class="tag fde">FDE</span></div>
+    </div>
+    <div class="card">
+      <h4>What's tested</h4>
+      <ul class="blist">
+        <li><code>tests/test_all_agents.py</code> and <code>tests/test_scenarios.py</code> exercise each agent module individually and as a pipeline.</li>
+        <li>Three canonical scenarios act as regression fixtures across the risk spectrum:</li>
+      </ul>
+    </div>
+    <div class="metric-grid">
+      <div class="metric-card"><div class="metric-num">$2.5M</div><div class="metric-lbl">ElectroCore Systems<br/>Low risk → Approved</div></div>
+      <div class="metric-card"><div class="metric-num">$1.8M</div><div class="metric-lbl">Precision Materials<br/>Medium risk → Approved</div></div>
+      <div class="metric-card"><div class="metric-num">$12M</div><div class="metric-lbl">LogisticsPro Global<br/>Critical risk → Escalate to CFO</div></div>
+    </div>
+    <div class="card">
+      <h4>How quality is enforced</h4>
+      <p>Each agent emits a per-output confidence score; the Governance Agent functions as an automated eval gate over the other five — checking confidence thresholds, policy/risk alignment, cross-agent contradictions, and field completeness before anything is marked approved.</p>
+      <div class="caveat">
+        <div class="caveat-lbl">Honest gap</div>
+        <p>Coverage is currently <strong>three scripted scenarios</strong>, not a benchmarked dataset. There's no adversarial/red-team invoice testing yet, no measured hallucination rate, and no LLM-as-judge scoring against a larger labeled set. Next step for production-grade eval: a held-out set of real (anonymized) invoices with human-labeled "correct" decisions to measure agreement rate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. ARCHITECTURE & TECHNICAL STACK -->
+  <div class="doc-section">
+    <div class="doc-hd">
+      <div class="doc-hd-left"><span class="doc-num">04</span><span class="doc-ttl">Architecture &amp; Technical Stack</span></div>
+      <div class="doc-tags"><span class="tag fde">FDE primary</span></div>
+    </div>
+    <div class="card">
+      <h4>Pipeline shape</h4>
+      <p>Invoice → Invoice Analysis → Supplier Risk → Working Capital Optimizer → Financing Recommender → Executive Summary → Governance Agent → Approved / Requires Review / Rejected / Escalate to CFO. Agents 1–5 are stateless with respect to each other — each reasons independently over the invoice and its own data slice using the ReAct pattern; only the Governance Agent sees all five outputs together.</p>
+      <h4>Stack</h4>
+      <ul class="blist">
+        <li><strong>Reasoning engine:</strong> Claude 3.5 Sonnet, one call per agent per invoice</li>
+        <li><strong>Orchestration:</strong> LangChain (0.1.14) for agent tooling, LangGraph for the pipeline graph</li>
+        <li><strong>Serving:</strong> Gradio (4.36.0) dashboard, deployed to Hugging Face Spaces (Docker-backed)</li>
+        <li><strong>Runtime:</strong> Python 3.13</li>
+        <li><strong>Data layer:</strong> supplier knowledge base (payment history, delivery metrics, financial health), treasury policy engine (rule thresholds), working-capital calculation models — currently in-memory / mock data, not a live ERP or treasury system feed</li>
+      </ul>
+      <h4>Module layout</h4>
+      <div class="mono-block">
+agents/<br/>
+├── data_models.py<br/>
+├── agent_invoice_analyzer.py<br/>
+├── agent_supplier_risk.py<br/>
+├── agent_wc_optimizer.py<br/>
+├── agent_financing_recommender.py<br/>
+├── agent_executive_summary.py<br/>
+└── agent_governance_langgraph.py<br/>
+tests/<br/>
+├── test_all_agents.py<br/>
+└── test_scenarios.py
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. REUSABLE TECHNICAL ASSETS -->
+  <div class="doc-section">
+    <div class="doc-hd">
+      <div class="doc-hd-left"><span class="doc-num">05</span><span class="doc-ttl">Reusable Technical Assets</span></div>
+      <div class="doc-tags"><span class="tag fde">FDE primary</span></div>
+    </div>
+    <div class="card">
+      <h4>Prompt library</h4>
+      <p>One ReAct-style prompt template per agent role, each deliberately scoped to a single, narrow judgment plus a confidence score — invoice validity, supplier risk, working-capital tradeoff, financing method, executive synthesis, governance check. The reusable pattern is <strong>"one agent, one narrow judgment, one confidence score"</strong> rather than one prompt trying to reason about everything at once.</p>
+      <h4>Runbook: the governance rule table</h4>
+      <div class="mono-block">
+<span class="rule">IF amount &gt; $5M</span> <span class="out">→ ESCALATE_TO_CFO</span><br/>
+<span class="rule">IF payment_method = "immediate"</span> <span class="out">→ ESCALATE_TO_CFO</span><br/>
+<span class="rule">IF risk &gt; 75 AND method = "normal"</span> <span class="out">→ REJECTED</span><br/>
+<span class="rule">IF any agent confidence &lt; 80%</span> <span class="out">→ REQUIRES_REVIEW</span><br/>
+<span class="rule">IF any policy check failed</span> <span class="out">→ REQUIRES_REVIEW</span><br/>
+<span class="rule">ELSE</span> <span class="out">→ APPROVED</span>
+      </div>
+      <p style="margin-top:14px;">This rule table is declarative and decoupled from the LLM agents — it's the one piece of the system that's meant to be edited by a compliance/treasury policy owner, not an engineer.</p>
+      <h4>What I'd reuse as-is</h4>
+      <ul class="blist">
+        <li>The <strong>confidence-gated governance pattern</strong> — upstream agents reason freely; one deterministic downstream validator enforces hard constraints. This generalizes to any multi-agent system operating in a regulated or high-stakes domain (lending, healthcare triage, procurement).</li>
+        <li>The one-agent-one-judgment decomposition, as a default starting shape for any new agentic workflow.</li>
+      </ul>
+      <h4>What I'd change next time</h4>
+      <ul class="blist">
+        <li>Persist the audit trail durably (it's generated per run today, not stored) so "show me every decision from Q3" is answerable.</li>
+        <li>Replace the mock supplier knowledge base with a real data-ingestion adapter before touching any real invoice data.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 6. DEPLOYMENT READINESS -->
+  <div class="doc-section">
+    <div class="doc-hd">
+      <div class="doc-hd-left"><span class="doc-num">06</span><span class="doc-ttl">Deployment Readiness</span></div>
+      <div class="doc-tags"><span class="tag fde">FDE primary</span></div>
+    </div>
+    <div class="card">
+      <h4>Current state</h4>
+      <p>Deployed to Hugging Face Spaces via Gradio on a free-tier Docker Space, which sleeps after inactivity and takes roughly 30–60 seconds to wake on the first request. Fine for a demo; not how it would run in production.</p>
+      <h4>Not yet production-ready</h4>
+      <ul class="blist">
+        <li>No persistent database — audit trails and run history aren't stored durably.</li>
+        <li>No authentication or access control on the Gradio UI.</li>
+        <li>No integration with a real ERP/treasury system — invoice and supplier data are mocked.</li>
+        <li>Secrets managed via a local <code>.env</code> file only; no secrets manager.</li>
+        <li>No CI/CD — deploys are manual pushes to the Space.</li>
+      </ul>
+      <h4>Path to production</h4>
+      <ul class="blist">
+        <li>Swap the mock supplier knowledge base for a real data source / ERP adapter.</li>
+        <li>Add durable storage for the governance audit trail.</li>
+        <li>Add authentication and move off free-tier sleeping compute.</li>
+        <li>Add monitoring and alerting on governance escalations (an escalation is exactly the event a real CFO wants paged on).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 7. METRICS & OUTCOMES -->
+  <div class="doc-section">
+    <div class="doc-hd">
+      <div class="doc-hd-left"><span class="doc-num">07</span><span class="doc-ttl">Metrics &amp; Outcomes</span></div>
+      <div class="doc-tags"><span class="tag both">BOTH</span></div>
+    </div>
+    <div class="card">
+      <h4>From the flagship demo scenario ($2.5M ElectroCore invoice)</h4>
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-num">$205,479</div><div class="metric-lbl">Working capital freed</div></div>
+        <div class="metric-card"><div class="metric-num">60 days</div><div class="metric-lbl">Optimal payment terms<br/>(extended from Net 30)</div></div>
+        <div class="metric-card"><div class="metric-num">6 / 6</div><div class="metric-lbl">Governance checks passed<br/>95% governance confidence</div></div>
+      </div>
+      <p class="source-note">Source: simulated run of this system, not production data.</p>
+      <h4 style="margin-top:6px;">From the simulated portfolio-level batch (Executive Summary agent)</h4>
+      <ul class="blist">
+        <li>85% auto-approval rate across the simulated monthly invoice batch</li>
+        <li>$2.1M working capital freed across that batch</li>
+      </ul>
+      <p class="source-note">Source: simulated batch output from this system, not production data.</p>
+      <div class="caveat">
+        <div class="caveat-lbl">Real-world benchmark (not this system's own metric)</div>
+        <p>This project is designed against — but has not itself processed — the real Honeywell × JPMorgan deployment: <strong>$900M+ across 260+ suppliers in 7 currencies</strong>. That figure is the scale ambition and design target, not a claimed outcome of this build. No real users or production invoices have run through this system yet.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>
+    <a href="supply-chain-finance.html">← Project Page</a> &nbsp;·&nbsp;
+    <a href="index.html">Portfolio</a> &nbsp;·&nbsp;
+    Muthuvisali Ravichandra Bose &nbsp;·&nbsp; Product Manager &amp; AI Builder
+  </p>
+</footer>
+
+</body>
+</html>

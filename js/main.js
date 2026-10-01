@@ -266,7 +266,7 @@ const qsa = (s, el = document) => [...el.querySelectorAll(s)];
         obs.unobserve(el);
       });
     },
-    { threshold: 0.5 },
+    { threshold: 0 },
   );
 
   qsa(".metric-val[data-target]").forEach((el) => obs.observe(el));
