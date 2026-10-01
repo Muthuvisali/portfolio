@@ -54,6 +54,8 @@
     .h-stat strong { color:var(--gold); }
     .hero-btns { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
     .btn-hero-gh { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:100px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; transition:all .3s ease; text-decoration:none; }
+    .btn-demo { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:100px; background:linear-gradient(135deg,var(--gold),var(--gold-h)); border:1.5px solid transparent; color:#fff; font-size:.9rem; font-weight:700; font-family:'Inter',sans-serif; transition:all .3s ease; text-decoration:none; }
+    .btn-demo:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(196,149,106,.35); }
     .btn-hero-gh:hover { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.45); transform:translateY(-3px); }
     .hero-deck { font-size:.82rem; color:rgba(255,255,255,.45); font-style:italic; margin:-22px auto 28px; }
     .hero-byline { font-size:.78rem; font-weight:600; color:rgba(255,255,255,.55); letter-spacing:.03em; margin-bottom:32px; }
@@ -309,6 +311,7 @@
       <div class="h-stat"><strong>Smoke tested</strong> prototype</div>
     </div>
     <div class="hero-btns">
+      <a href="https://visaliravi-microintent.static.hf.space" target="_blank" rel="noopener" class="btn-demo">▶ Try the live demo</a>
       <a href="https://github.com/Muthuvisali/MicroIntent_Prototype_v0.2.1" target="_blank" rel="noopener" class="btn-hero-gh">⌥ Prototype repository</a>
     </div>
   </div>
@@ -633,18 +636,18 @@
         <img src="images/microintent-architecture.png" width="1800" height="1150" loading="lazy"
              alt="Diagram titled MicroIntent MVP End-to-End Architecture, labeled as a conceptual prototype and not a representation of Google's proprietary systems. Row one: user, search like prototype UI, conversation context manager, LLM answer generator. Row two: micro intent extractor, safety and policy gate, commercial intent scoring, candidate retrieval with Postgres and pgvector. Row three: relevance and auction ranking, ad saturation controller, grounded why this matches generator, and a response composer that returns organic and sponsored results to the UI. Every stage reports into a telemetry and evaluation harness."/>
       </a>
-      <figcaption><strong>Conceptual MVP architecture.</strong> Not a representation of Google's proprietary systems. In the current prototype, answer text is templated and retrieval runs over a JSON catalog; Postgres + pgvector is the next iteration.</figcaption>
+      <figcaption><strong>Conceptual MVP architecture.</strong> Not a representation of Google's proprietary systems. In the current prototype, guidance for catalog components is templated (Gemini writes it for other components) and retrieval runs over a JSON catalog; Postgres + pgvector is the next iteration.</figcaption>
     </figure>
 
     <div class="comp-grid">
-      <div class="comp fu"><div class="comp-n">1</div><div><div class="comp-ttl">Context manager</div><div class="comp-desc">Accumulates only explicit in session constraints for the MVP.</div></div></div>
-      <div class="comp fu delay-1"><div class="comp-n">2</div><div><div class="comp-ttl">Micro intent extractor</div><div class="comp-desc">Produces structured JSON. The LLM interprets intent but does not directly choose the winning advertisement.</div></div></div>
+      <div class="comp fu"><div class="comp-n">1</div><div><div class="comp-ttl">Context manager</div><div class="comp-desc">Uses only preferences the user states in this session. The current message sets the topic; follow ups inherit it, and a new topic starts fresh.</div></div></div>
+      <div class="comp fu delay-1"><div class="comp-n">2</div><div><div class="comp-ttl">Micro intent extractor</div><div class="comp-desc">Produces structured JSON with Gemini or a deterministic rule engine, behind one schema. Gemini labels are mapped onto catalog categories. The LLM interprets intent but never chooses the winning advertisement.</div></div></div>
       <div class="comp fu delay-2"><div class="comp-n g">3</div><div><div class="comp-ttl">Safety gate</div><div class="comp-desc">Stops sensitive contexts before commercial retrieval.</div></div></div>
       <div class="comp fu delay-3"><div class="comp-n">4</div><div><div class="comp-ttl">Candidate retrieval</div><div class="comp-desc">Fetches products whose category and structured attributes can satisfy the micro intent.</div></div></div>
       <div class="comp fu delay-4"><div class="comp-n">5</div><div><div class="comp-ttl">Ranking / auction simulator</div><div class="comp-desc">Uses a transparent prototype formula. It is explicitly not Google's formula.</div></div></div>
       <div class="comp fu delay-5"><div class="comp-n g">6</div><div><div class="comp-ttl">Saturation controller</div><div class="comp-desc">Caps ad density, allows one slot per advertiser per answer, and records which rule rejected each eligible slot.</div></div></div>
       <div class="comp fu"><div class="comp-n">7</div><div><div class="comp-ttl">Explanation generator</div><div class="comp-desc">Produces grounded match reasons from structured facts.</div></div></div>
-      <div class="comp fu delay-1"><div class="comp-n">8</div><div><div class="comp-ttl">Evaluation / telemetry</div><div class="comp-desc">Records why a unit was blocked, eligible, ranked or selected.</div></div></div>
+      <div class="comp fu delay-1"><div class="comp-n">8</div><div><div class="comp-ttl">Decision trace / evaluation</div><div class="comp-desc">Every response records why each component was blocked, eligible, ranked or selected; an evaluation harness checks expected behavior. Persistent telemetry is the next iteration.</div></div></div>
     </div>
   </div>
 </section>
@@ -781,7 +784,7 @@
   <div class="sec-inner">
     <div class="sec-tag fu">Prototype Status</div>
     <h2 class="sec-title fu">What Is Built,<br/><span class="ac">and What It Proves</span></h2>
-    <p class="sec-lead fu">MicroIntent is a <strong>conceptual prototype</strong>. It runs locally against a synthetic merchant catalog and is not deployed. It shows the pipeline behaves as designed; it does not show that the idea works in market.</p>
+    <p class="sec-lead fu">MicroIntent is a <strong>conceptual prototype</strong>. It runs against a synthetic merchant catalog; the public demo runs the same Python pipeline in your browser, with the rule based extractor and no LLM calls. It shows the pipeline behaves as designed; it does not show that the idea works in market.</p>
 
     <div class="verdict-strip fu">
       <div class="vs-left">
@@ -806,11 +809,12 @@
         <div class="impact-hd"><div class="impact-ico">🧱</div><div class="impact-ttl">Implemented</div></div>
         <ul class="impact-list">
           <li><strong>FastAPI service</strong> with a functional chat endpoint and a lightweight browser demo</li>
+          <li><strong>Public live demo</strong> on Hugging Face: the same Python pipeline runs in the visitor's browser (Pyodide), with no server and no LLM calls</li>
           <li><strong>Pydantic schemas</strong> for sessions, micro intents, candidates, sponsored placements and decision traces</li>
-          <li><strong>Two micro intent extractors</strong> behind one schema: Gemini structured output when an API key is configured, and a deterministic engine that needs no key. Every fallback is recorded in the trace</li>
-          <li><strong>Multi turn session context</strong> that accumulates only preferences the user states explicitly</li>
+          <li><strong>Two micro intent extractors</strong> behind one schema: Gemini structured output when an API key is configured, and a deterministic engine that needs no key. Gemini is given the catalog's component labels and writes per component guidance. Every fallback is recorded in the trace</li>
+          <li><strong>Multi turn session context</strong> that accumulates only preferences the user states explicitly; the current message sets the topic, so a new topic drops earlier preferences</li>
           <li><strong>Synthetic merchant catalog</strong> of 36 fictional skincare, bag and Japan trip products from competing advertisers, avoiding live advertiser data</li>
-          <li><strong>Safety gate</strong> blocking representative healthcare, fertility and political contexts before retrieval</li>
+          <li><strong>Safety gate</strong> blocking representative health, fertility, finance, gambling and political contexts before retrieval, checked across the whole conversation</li>
           <li><strong>Three separate surfaces</strong> per answer section: AI guidance, bid free organic options, and at most one labeled sponsored match</li>
           <li><strong>Ranking and saturation</strong> simulator with a hard score threshold, a configurable cap and a one slot per advertiser rule</li>
           <li><strong>Graceful failure:</strong> if the ad system errors, the organic answer still ships and the trace reports it</li>
@@ -857,9 +861,10 @@
 <section id="cta">
   <div class="cta-inner">
     <h2 class="cta-ttl fu">Explore the Prototype</h2>
-    <p class="cta-sub fu">FastAPI service, structured schemas, safety gate, organic and sponsored surfaces, ranking and saturation logic, decision traces, tests and a small evaluation harness. Runs locally; nothing is deployed.</p>
+    <p class="cta-sub fu">FastAPI service, structured schemas, safety gate, organic and sponsored surfaces, ranking and saturation logic, decision traces, tests and a small evaluation harness. The live demo runs entirely in your browser; the first load takes about ten seconds.</p>
     <div class="cta-btns fu">
       <a href="index.html#projects" class="btn-case-study">← Back to Projects</a>
+      <a href="https://visaliravi-microintent.static.hf.space" target="_blank" rel="noopener" class="btn-demo">▶ Try the live demo</a>
       <a href="https://github.com/Muthuvisali/MicroIntent_Prototype_v0.2.1" target="_blank" rel="noopener" class="btn-hero-gh">⌥ Prototype repository</a>
     </div>
   </div>
