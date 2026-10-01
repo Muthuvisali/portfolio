@@ -669,8 +669,16 @@
   <span class="k">"sensitive_domain"</span>: <span class="n">false</span>
 }</pre>
 
-    <h3 class="sub-hd fu">Prototype ranking function</h3>
-    <p class="body-p fu">The working prototype uses an intentionally simple, inspectable score:</p>
+    <h3 class="sub-hd fu">How MicroIntent decides what to monetize</h3>
+    <p class="body-p fu">Every micro intent passes four separate decisions. Failing any one of them means no sponsored unit for that part of the answer.</p>
+    <div class="comp-grid" style="margin-bottom:28px;">
+      <div class="comp fu"><div class="comp-n">1</div><div><div class="comp-ttl">Is it commercial?</div><div class="comp-desc">Each component gets its own commercial intent score from 0 to 1. With Gemini enabled, the model scores against a written rubric (informational, latent, considering, shopping, buying). Without it, a transparent rule based scorer combines request type, buying language and stated preferences, weighted by how essential the component is. Eligible at <strong>0.55</strong>; sensitive contexts are blocked before any ad is looked up.</div></div></div>
+      <div class="comp fu delay-1"><div class="comp-n">2</div><div><div class="comp-ttl">Is there a good enough ad?</div><div class="comp-desc">Eligible components are matched against a synthetic catalog and ranked with the score below. If the best ad scores under <strong>0.75</strong>, nothing is shown.</div></div></div>
+      <div class="comp fu delay-2"><div class="comp-n g">3</div><div><div class="comp-ttl">Which slots win?</div><div class="comp-desc">Eligible slots are ordered by placement priority, an equal blend of commercial intent and ad score. Two units per answer by default, one slot per advertiser, and every rejected slot records why: the cap or the diversity rule.</div></div></div>
+      <div class="comp fu delay-3"><div class="comp-n g">4</div><div><div class="comp-ttl">What does the user see?</div><div class="comp-desc">AI guidance, organic options ranked with <strong>no bid input</strong>, and at most one clearly labeled sponsored match. The paid unit never replaces the best organic option.</div></div></div>
+    </div>
+
+    <p class="body-p fu">Ad ranking uses an intentionally simple, inspectable score. Relevance carries the most weight so a high bid cannot buy an irrelevant slot:</p>
     <div class="formula fu">
       <div class="formula-eq">Score = 0.40R + 0.20C + 0.15Q + 0.15B + 0.10U</div>
       <div class="formula-legend">
@@ -685,6 +693,7 @@
       <span aria-hidden="true">⛔</span>
       <div><strong>Hard rule.</strong> If the best contextual score is below the minimum eligibility threshold, show no sponsored unit, even if an advertiser has a high bid.</div>
     </div>
+    <p class="note fu">What is hand set, and what is next. The weights, thresholds and per component priors are deliberate, inspectable choices, not values learned from data. They make the tradeoffs visible: relevance over bid, scarcity over coverage. The next step is to calibrate them against human labeled conversations.</p>
 
     <h3 class="sub-hd fu">Safety decisions</h3>
     <p class="body-p fu">Google's public Ads in AI Overviews documentation already excludes sensitive verticals such as healthcare, finance and politics from inline placements.<a class="cite" href="#src-3">[3]</a> The MVP follows the same principle: commercial eligibility is blocked before retrieval in sensitive contexts.</p>
@@ -781,7 +790,7 @@
       </div>
       <div class="vs-divider"></div>
       <div class="vs-stat">
-        <div class="vs-num">15 / 15</div>
+        <div class="vs-num">25 / 25</div>
         <div class="vs-desc">Automated tests passing</div>
       </div>
       <div class="vs-divider"></div>
